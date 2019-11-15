@@ -34,25 +34,7 @@ namespace HouseFurnishingKit.Items {
 			//HouseFurnishingKitItem.MakeHouseTile3x2( TileID.Tables, floorRight, floorY );
 			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches, floorRight - 1, floorY );
 			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs, floorRight - 2, floorY );
-
-			(ushort TileType, int Width, int Height) custFurniture = HouseFurnishingKitMod.Instance.CustomFurniture;
-			if( custFurniture.TileType != 0 ) {
-				WorldGen.PlaceTile( floorLeft+5, floorY, custFurniture.TileType );
-			}
-
-			(ushort TileType, int Width, int Height) custWallMount1 = HouseFurnishingKitMod.Instance.Custom3x3WallMount1;
-			if( custWallMount1.TileType != 0 ) {
-				if( custWallMount1.Width == 3 && custWallMount1.Height == 3 ) {
-					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, floorLeft, floorY - 5 );
-				}
-			}
-			
-			(ushort TileType, int Width, int Height) custWallMount2 = HouseFurnishingKitMod.Instance.Custom3x3WallMount2;
-			if( custWallMount2.TileType != 0 ) {
-				if( custWallMount2.Width == 3 && custWallMount2.Height == 3 ) {
-					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, floorRight - 2, floorY - 5 );
-				}
-			}
+			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft, floorRight, floorY );
 
 			Main.tile[topLeft.x - 1, topLeft.y].type = TileID.Torches;
 			Main.tile[topLeft.x - 1, topLeft.y].active( true );
@@ -179,7 +161,46 @@ namespace HouseFurnishingKit.Items {
 					Main.tile[i, j].active( false );
 				}
 			}
-			WorldGen.Place3x3Wall( tileX - 1, tileY, tileType, 0 );
+			WorldGen.Place3x3Wall( tileX, tileY, tileType, 0 );
+		}
+
+		////
+
+		private static void MakeHouseCustomFurnishings( int leftTileX, int rightTileX, int tileY ) {
+			(ushort TileType, int Width, int Height) custFurniture = HouseFurnishingKitMod.Instance.CustomFurniture;
+			if( custFurniture.TileType != 0 ) {
+//Main.NewText( "placing CustomFurniture " + custFurniture.TileType );
+//Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
+				switch( custFurniture.TileType ) {
+				case TileID.Bottles:
+				case TileID.PiggyBank:
+					WorldGen.PlaceTile( leftTileX + 5, tileY, TileID.Platforms );
+					WorldGen.PlaceTile( leftTileX + 6, tileY, TileID.Platforms );
+					WorldGen.PlaceTile( leftTileX + 5, tileY - 1, custFurniture.TileType );
+					break;
+				default:
+					WorldGen.PlaceTile( leftTileX + 5, tileY, custFurniture.TileType );
+					break;
+				}
+			}
+
+			(ushort TileType, int Width, int Height) custWallMount1 = HouseFurnishingKitMod.Instance.Custom3x3WallMount1;
+			if( custWallMount1.TileType != 0 ) {
+//Main.NewText( "placing Custom3x3WallMount1 " + custWallMount1.TileType );
+//Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
+				if( custWallMount1.Width == 3 && custWallMount1.Height == 3 ) {
+					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, leftTileX, tileY - 3 );
+				}
+			}
+
+			(ushort TileType, int Width, int Height) custWallMount2 = HouseFurnishingKitMod.Instance.Custom3x3WallMount2;
+			if( custWallMount2.TileType != 0 ) {
+//Main.NewText( "placing Custom3x3WallMount2 " + custWallMount2.TileType );
+//Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
+				if( custWallMount2.Width == 3 && custWallMount2.Height == 3 ) {
+					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount2.TileType, rightTileX - 1, tileY - 3 );
+				}
+			}
 		}
 	}
 }
