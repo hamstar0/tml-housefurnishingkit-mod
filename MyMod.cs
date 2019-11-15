@@ -1,3 +1,7 @@
+using HamstarHelpers.Helpers.TModLoader.Mods;
+using System;
+using System.Collections.Generic;
+using Terraria;
 using Terraria.ModLoader;
 
 
@@ -20,6 +24,8 @@ namespace HouseFurnishingKit {
 		public (ushort TileType, int Width, int Height) Custom3x3WallMount1 = (0, 0, 0);
 		public (ushort TileType, int Width, int Height) Custom3x3WallMount2 = (0, 0, 0);
 
+		internal IList<Action<int, int, Item>> OnHouseCreate = new List<Action<int, int, Item>>();
+
 
 
 		////////////////
@@ -30,6 +36,13 @@ namespace HouseFurnishingKit {
 
 		public override void Unload() {
 			HouseFurnishingKitMod.Instance = null;
+		}
+
+
+		////////////////
+
+		public override object Call( params object[] args ) {
+			return ModBoilerplateHelpers.HandleModCall( typeof(HouseFurnishingKitAPI), args );
 		}
 	}
 }

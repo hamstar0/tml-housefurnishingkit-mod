@@ -60,6 +60,11 @@ namespace HouseFurnishingKit.Items {
 
 			if( state == HouseViabilityState.Good ) {
 				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY );
+
+				foreach( Action<int, int, Item> action in HouseFurnishingKitMod.Instance.OnHouseCreate ) {
+					action( tileX, tileY, this.item );
+				}
+
 				return true;
 			} else {
 				Color color;
