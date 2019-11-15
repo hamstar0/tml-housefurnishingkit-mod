@@ -129,7 +129,7 @@ namespace HouseFurnishingKit.Items {
 		}
 
 		private static void MakeHouseTile3x2( ushort tileType, int tileX, int tileY ) {
-			for( int i = tileX - 3; i <= tileX; i++ ) {
+			for( int i = tileX - 2; i <= tileX; i++ ) {
 				for( int j = tileY - 1; j <= tileY; j++ ) {
 					Main.tile[i, j].active( false );
 				}
@@ -178,8 +178,13 @@ namespace HouseFurnishingKit.Items {
 					WorldGen.PlaceTile( leftTileX + 6, tileY, TileID.Platforms );
 					WorldGen.PlaceTile( leftTileX + 5, tileY - 1, custFurniture.TileType );
 					break;
+
 				default:
-					WorldGen.PlaceTile( leftTileX + 5, tileY, custFurniture.TileType );
+					if( custFurniture.Width == 3 && custFurniture.Height == 2 ) {
+						HouseFurnishingKitItem.MakeHouseTile3x2( custFurniture.TileType, leftTileX + 5, tileY );
+					} else {
+						WorldGen.PlaceTile( leftTileX + 5, tileY, custFurniture.TileType );
+					}
 					break;
 				}
 			}
