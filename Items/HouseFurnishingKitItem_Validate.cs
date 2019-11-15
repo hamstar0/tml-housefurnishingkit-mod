@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using System;
 
 
-namespace AdventureMode.Items {
+namespace HouseFurnishingKit.Items {
 	public enum HouseViabilityState {
 		Good,
 		TooSmall,
@@ -18,7 +18,7 @@ namespace AdventureMode.Items {
 
 
 
-	partial class HouseFurnishingKitItem : ModItem {
+	public partial class HouseFurnishingKitItem : ModItem {
 		public static string GetViabilityStateMessage( HouseViabilityState state, out Color color ) {
 			switch( state ) {
 			case HouseViabilityState.Good:
@@ -65,15 +65,15 @@ namespace AdventureMode.Items {
 					|| ( Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0 );  //stair
 			}
 
-			TilePattern pattern1 = new TilePattern( new TilePatternBuilder {
-				AreaFromCenter = new Rectangle( -2, -2, 4, 4 ),
+			TilePattern innerPattern = new TilePattern( new TilePatternBuilder {
+				AreaFromCenter = new Rectangle( -2, -3, 4, 5 ),
 				HasWater = false,
 				HasHoney = false,
 				HasLava = false,
 				IsActuated = false,
 				CustomCheck = customCheck
 			} );
-			TilePattern pattern2 = new TilePattern( new TilePatternBuilder {
+			TilePattern outerPattern = new TilePattern( new TilePatternBuilder {
 				HasWater = false,
 				HasHoney = false,
 				HasLava = false,
@@ -82,14 +82,14 @@ namespace AdventureMode.Items {
 			} );
 			HouseViabilityState state;
 
-			state = HouseFurnishingKitItem.IsValidHouseByCriteria( pattern2, tileX, tileY, out fullHouseSpace, out floorX, out floorY );
+			state = HouseFurnishingKitItem.IsValidHouseByCriteria( outerPattern, tileX, tileY, 80, out fullHouseSpace, out floorX, out floorY );
 			if( state != HouseViabilityState.Good ) {
 				innerHouseSpace = fullHouseSpace;
 				return state;
 			}
 
 			int altFloorY = floorY;
-			state = HouseFurnishingKitItem.IsValidHouseByCriteria( pattern1, floorX, tileY, out innerHouseSpace, out floorX, out altFloorY );
+			state = HouseFurnishingKitItem.IsValidHouseByCriteria( innerPattern, floorX, tileY, 60, out innerHouseSpace, out floorX, out altFloorY );
 			if( state != HouseViabilityState.Good ) {
 				return state;
 			}
@@ -102,6 +102,7 @@ namespace AdventureMode.Items {
 					TilePattern pattern,
 					int tileX,
 					int tileY,
+					int minimumVolume,
 					out IList<(ushort TileX, ushort TileY)> houseSpace,
 					out int floorX,
 					out int floorY ) {
@@ -119,7 +120,7 @@ namespace AdventureMode.Items {
 				return HouseViabilityState.TooLarge;
 			}
 
-			if( houseSpace.Count < 80 ) {
+			if( houseSpace.Count < minimumVolume ) {
 				floorX = floorY = 0;
 				return HouseViabilityState.TooSmall;
 			}

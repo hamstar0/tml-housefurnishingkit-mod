@@ -5,8 +5,8 @@ using System;
 using Microsoft.Xna.Framework;
 
 
-namespace AdventureMode.Items {
-	partial class HouseFurnishingKitItem : ModItem {
+namespace HouseFurnishingKit.Items {
+	public partial class HouseFurnishingKitItem : ModItem {
 		public static int Width = 24;
 		public static int Height = 22;
 

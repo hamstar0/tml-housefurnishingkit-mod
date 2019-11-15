@@ -1,4 +1,4 @@
-﻿using AdventureMode.Items;
+﻿using HouseFurnishingKit.Items;
 using HamstarHelpers.Helpers.Debug;
 using Microsoft.Xna.Framework;
 using System;
