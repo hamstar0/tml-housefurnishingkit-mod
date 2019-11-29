@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using System;
+using HamstarHelpers.Helpers.Tiles;
 
 
 namespace HouseFurnishingKit.Items {
@@ -29,12 +30,13 @@ namespace HouseFurnishingKit.Items {
 				out farTopRight
 			);
 
+			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
 			HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
-			HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds, floorLeft, floorY );
-			//HouseFurnishingKitItem.MakeHouseTile3x2( TileID.Tables, floorRight, floorY );
-			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches, floorRight - 1, floorY );
-			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs, floorRight - 2, floorY );
-			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft, floorRight, floorY );
+			HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds, floorLeft + 1, floorY );
+			//HouseFurnishingKitItem.MakeHouseTile3x2( TileID.Tables, floorRight - 1, floorY );
+			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches, floorRight - 2, floorY );
+			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs, floorRight - 3, floorY );
+			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft + 1, floorRight - 1, floorY );
 
 			Main.tile[topLeft.x - 1, topLeft.y].type = TileID.Torches;
 			Main.tile[topLeft.x - 1, topLeft.y].active( true );
@@ -106,6 +108,60 @@ namespace HouseFurnishingKit.Items {
 
 
 		////////////////
+
+		private static void CleanHouse( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {
+			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
+				Tile tile = Main.tile[tileX, tileY];
+				if( !tile.active() ) { continue; }
+				if( Main.tileSolid[tile.type] ) { continue; }
+
+				WorldGen.KillTile( tileX, tileY, false, false, true );
+				
+				if( tile.active() ) {
+					switch( tile.type ) {
+					case TileID.Platforms:
+					case TileID.MinecartTrack:
+					case TileID.Torches:
+					case TileID.Rope:
+					case TileID.SilkRope:
+					case TileID.VineRope:
+					case TileID.WebRope:
+					case TileID.Chain:
+					///
+					case TileID.Tombstones:
+					case TileID.CopperCoinPile:
+					case TileID.SilverCoinPile:
+					case TileID.GoldCoinPile:
+					case TileID.PlatinumCoinPile:
+					case TileID.Stalactite:
+					case TileID.SmallPiles:
+					case TileID.LargePiles:
+					case TileID.LargePiles2:
+					case TileID.ExposedGems:
+					///
+					case TileID.Heart:
+					case TileID.Pots:
+					case TileID.ShadowOrbs:
+					case TileID.DemonAltar:
+					case TileID.LifeFruit:
+					case TileID.PlanteraBulb:
+					case TileID.Bottles:
+					case TileID.Books:
+					case TileID.WaterCandle:
+					case TileID.PeaceCandle:
+					///
+					case TileID.MagicalIceBlock:
+						WorldGen.KillTile( tileX, tileY, false, false, true );
+						break;
+					default:
+						if( TileGroupIdentityHelpers.VanillaShrubTiles.Contains(tile.type) ) {
+							WorldGen.KillTile( tileX, tileY, false, false, true );
+						}
+						break;
+					}
+				}
+			}
+		}
 
 		private static void MakeHouseWalls( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {

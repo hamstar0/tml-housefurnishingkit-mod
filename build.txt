@@ -1,6 +1,6 @@
 displayName = House Furnishing Kit
 author = hamstar
 version = 1.0.0
-modReferences = HamstarHelpers@5.3.4
+modReferences = HamstarHelpers@5.4.0
 buildIgnore = *.csproj, *.user, *.bat, obj\*, bin\*, .vs\*, .git\*
 homepage = https://forums.terraria.org/index.php?threads/psycho.61219/
