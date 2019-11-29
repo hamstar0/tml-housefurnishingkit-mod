@@ -40,6 +40,55 @@ namespace HouseFurnishingKit.Items {
 			return "";
 		}
 
+		////
+
+		public static bool IsCleanableTile( Tile tile ) {
+			if( !tile.active() ) {
+				return false;
+			}
+			if( Main.tileSolid[tile.type] ) {
+				return false;
+			}
+
+			switch( tile.type ) {
+			case TileID.Platforms:
+			case TileID.MinecartTrack:
+			case TileID.Torches:
+			case TileID.Rope:
+			case TileID.SilkRope:
+			case TileID.VineRope:
+			case TileID.WebRope:
+			case TileID.Chain:
+			///
+			case TileID.Tombstones:
+			case TileID.CopperCoinPile:
+			case TileID.SilverCoinPile:
+			case TileID.GoldCoinPile:
+			case TileID.PlatinumCoinPile:
+			case TileID.Stalactite:
+			case TileID.SmallPiles:
+			case TileID.LargePiles:
+			case TileID.LargePiles2:
+			case TileID.ExposedGems:
+			///
+			case TileID.Heart:
+			case TileID.Pots:
+			case TileID.ShadowOrbs:
+			case TileID.DemonAltar:
+			case TileID.LifeFruit:
+			case TileID.PlanteraBulb:
+			case TileID.Bottles:
+			case TileID.Books:
+			case TileID.WaterCandle:
+			case TileID.PeaceCandle:
+			///
+			case TileID.MagicalIceBlock:
+				return true;
+			default:
+				return TileGroupIdentityHelpers.VanillaShrubTiles.Contains( tile.type );
+			}
+		}
+
 
 		////////////////
 
