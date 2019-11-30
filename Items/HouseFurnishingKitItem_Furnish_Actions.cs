@@ -54,6 +54,11 @@ namespace HouseFurnishingKit.Items {
 			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 3, 2, occupiedTiles );
 		}
 
+		private static void MakeHouseTile3x3( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+			TileHelpers.PlaceTile3x3( tileX, tileY, tileType, 0 );
+			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 3, 3, occupiedTiles );
+		}
+
 		private static void MakeHouseTile2x1( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
 			TileHelpers.PlaceTile2x1( tileX, tileY, tileType );
 			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 2, 1, occupiedTiles );
@@ -87,23 +92,25 @@ namespace HouseFurnishingKit.Items {
 //Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
 				switch( custFurniture.TileType ) {
 				case TileID.Bottles:
-					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 2, TileID.Platforms );
-					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 3, custFurniture.TileType );
+					WorldGen.PlaceTile(					leftTileX + 4,	floorY - 1, TileID.Platforms );
+					WorldGen.PlaceTile(					leftTileX + 4,	floorY - 2, custFurniture.TileType );
 					HouseFurnishingKitItem.MarkOccupiedTiles(	leftTileX + 5,	floorY - 2, 1, 2, occupiedTiles );
 					break;
 				case TileID.PiggyBank:
-					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 2, TileID.Platforms );
-					WorldGen.PlaceTile(					leftTileX + 6,	floorY - 2, TileID.Platforms );
-					TileHelpers.PlaceTile2x1(			leftTileX + 5,	floorY - 3, custFurniture.TileType );
+					WorldGen.PlaceTile(					leftTileX + 4,	floorY - 1, TileID.Platforms );
+					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 1, TileID.Platforms );
+					TileHelpers.PlaceTile2x1(			leftTileX + 4,	floorY - 2, custFurniture.TileType );
 					HouseFurnishingKitItem.MarkOccupiedTiles(	leftTileX + 5,	floorY - 2, 2, 2, occupiedTiles );
 					break;
 
 				default:
 					if( custFurniture.Width == 3 && custFurniture.Height == 2 ) {
-						HouseFurnishingKitItem.MakeHouseTile3x2( custFurniture.TileType, leftTileX + 5, floorY - 2, occupiedTiles );
+						HouseFurnishingKitItem.MakeHouseTile3x2( custFurniture.TileType, leftTileX + 4, floorY - 1, occupiedTiles );
+					} else if( custFurniture.Width == 3 && custFurniture.Height == 3 ) {
+						HouseFurnishingKitItem.MakeHouseTile3x3( custFurniture.TileType, leftTileX + 4, floorY - 2, occupiedTiles );
 					} else {
-						WorldGen.PlaceTile(		leftTileX + 5,	floorY, custFurniture.TileType );
-						occupiedTiles.Set2D(	leftTileX + 5,	floorY );
+						WorldGen.PlaceTile(		leftTileX + 4,	floorY, custFurniture.TileType );
+						occupiedTiles.Set2D(	leftTileX + 4,	floorY );
 					}
 					break;
 				}
@@ -114,7 +121,7 @@ namespace HouseFurnishingKit.Items {
 //Main.NewText( "placing Custom3x3WallMount1 " + custWallMount1.TileType );
 //Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
 				if( custWallMount1.Width == 3 && custWallMount1.Height == 3 ) {
-					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, leftTileX, floorY - 6, occupiedTiles );
+					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, leftTileX, floorY - 4, occupiedTiles );
 				}
 			}
 
@@ -123,7 +130,7 @@ namespace HouseFurnishingKit.Items {
 //Main.NewText( "placing Custom3x3WallMount2 " + custWallMount2.TileType );
 //Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
 				if( custWallMount2.Width == 3 && custWallMount2.Height == 3 ) {
-					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount2.TileType, rightTileX - 3, floorY - 6, occupiedTiles );
+					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount2.TileType, rightTileX - 3, floorY - 4, occupiedTiles );
 				}
 			}
 		}
