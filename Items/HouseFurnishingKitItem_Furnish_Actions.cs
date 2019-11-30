@@ -59,9 +59,11 @@ namespace HouseFurnishingKit.Items {
 			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 2, 1, occupiedTiles );
 		}
 
-		private static void MakeHouseTile1x2( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+		private static void MakeHouseTile1x2( ushort tileType, int tileX, int tileY, int xFrameOffset, IDictionary<int, ISet<int>> occupiedTiles ) {
 			TileHelpers.PlaceTile1x2( tileX, tileY, tileType );
 			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 1, 2, occupiedTiles );
+			Main.tile[ tileX, tileY-1 ].frameX = (short)xFrameOffset;
+			Main.tile[ tileX, tileY ].frameX = (short)xFrameOffset;
 		}
 
 		////

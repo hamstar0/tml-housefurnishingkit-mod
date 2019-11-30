@@ -34,7 +34,7 @@ namespace HouseFurnishingKit.Items {
 			HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
 			HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds,				floorLeft,		floorY - 1,	occupiedTiles );
 			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches,		floorRight - 2,	floorY,		occupiedTiles );
-			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs,				floorRight - 3,	floorY - 1, occupiedTiles );
+			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs,				floorRight - 3,	floorY - 1, 18, occupiedTiles );
 			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft,		floorRight,		floorY, occupiedTiles );
 			HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,			topLeft.x,		topLeft.y, innerHouseSpace, occupiedTiles );
 			HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,			topRight.x,		topRight.y, innerHouseSpace, occupiedTiles );
