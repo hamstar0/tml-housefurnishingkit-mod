@@ -11,7 +11,9 @@ using HouseFurnishingKit.Protocols;
 namespace HouseFurnishingKit {
 	class Blah : CustomPlayerData {
 		protected override void OnEnter( object data ) {
-			CustomFurnitureProtocol.QuickRequest();
+			if( Main.netMode == 1 ) {
+				CustomFurnitureProtocol.QuickRequest();
+			}
 		}
 	}
 
