@@ -9,7 +9,7 @@ using HouseFurnishingKit.Protocols;
 
 
 namespace HouseFurnishingKit {
-	class Blah : CustomPlayerData {
+	class HouseFurnishingKitCustomPlayer : CustomPlayerData {
 		protected override void OnEnter( object data ) {
 			if( Main.netMode == 1 ) {
 				CustomFurnitureProtocol.QuickRequest();
@@ -44,7 +44,7 @@ namespace HouseFurnishingKit {
 			if( Main.myPlayer != this.player.whoAmI ) {
 				return;
 			}
-
+			
 			int zoomedX = (int)this.player.Center.X / 64;
 			int zoomedY = (int)this.player.Center.Y / 64;
 
