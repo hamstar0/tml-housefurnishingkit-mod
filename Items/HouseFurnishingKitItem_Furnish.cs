@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using System;
-using HamstarHelpers.Helpers.Tiles;
 
 
 namespace HouseFurnishingKit.Items {
@@ -17,6 +16,7 @@ namespace HouseFurnishingKit.Items {
 			(int x, int y) topLeft, topRight;
 			int floorLeft, floorRight;
 			(int x, int y) farTopLeft, farTopRight;
+			IDictionary<int, ISet<int>> occupiedTiles = new Dictionary<int, ISet<int>>();
 
 			HouseFurnishingKitItem.FindHousePoints(
 				innerHouseSpace,
@@ -32,16 +32,13 @@ namespace HouseFurnishingKit.Items {
 
 			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
 			HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
-			HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds, floorLeft + 1, floorY );
-			//HouseFurnishingKitItem.MakeHouseTile3x2( TileID.Tables, floorRight - 1, floorY );
-			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches, floorRight - 2, floorY );
-			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs, floorRight - 3, floorY );
-			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft + 1, floorRight - 1, floorY );
-
-			Main.tile[topLeft.x - 1, topLeft.y].type = TileID.Torches;
-			Main.tile[topLeft.x - 1, topLeft.y].active( true );
-			Main.tile[topRight.x, topRight.y].type = TileID.Torches;
-			Main.tile[topRight.x, topRight.y].active( true );
+			HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds,				floorLeft,		floorY - 1,	occupiedTiles );
+			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches,		floorRight - 2,	floorY,		occupiedTiles );
+			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs,				floorRight - 3,	floorY - 1, occupiedTiles );
+			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft,		floorRight,		floorY, occupiedTiles );
+			HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,			topLeft.x,		topLeft.y, innerHouseSpace, occupiedTiles );
+			HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,			topRight.x,		topRight.y, innerHouseSpace, occupiedTiles );
+			
 		}
 
 
@@ -72,7 +69,8 @@ namespace HouseFurnishingKit.Items {
 					topLeft.y = topRight.y = tileY;
 				}
 
-				if( tileY == (floorY-2) ) {
+				//if( tileY == (floorY-2) ) {
+				if( tileY == (floorY-1) ) {
 					if( floorLeft == 0 ) {
 						floorLeft = floorRight = tileX;
 					} else {

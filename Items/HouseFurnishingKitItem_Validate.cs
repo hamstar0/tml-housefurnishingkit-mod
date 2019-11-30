@@ -24,7 +24,7 @@ namespace HouseFurnishingKit.Items {
 			switch( state ) {
 			case HouseViabilityState.Good:
 				color = Color.Lime;
-				return "Valid town house space found. Note: Only above ground houses work automatically.";
+				return "Valid town house space found. Note: Only above ground houses are automatically occupied.";
 			case HouseViabilityState.TooSmall:
 				color = Color.Yellow;
 				return "House too small.";
@@ -42,16 +42,18 @@ namespace HouseFurnishingKit.Items {
 
 		////
 
-		public static bool IsCleanableTile( Tile tile ) {
+		public static bool IsCleanableTile( Tile tile, bool skipPlatforms ) {
 			if( !tile.active() ) {
-				return false;
-			}
-			if( Main.tileSolid[tile.type] ) {
 				return false;
 			}
 
 			switch( tile.type ) {
 			case TileID.Platforms:
+				if( !skipPlatforms ) {
+					return true;
+				}
+				break;
+			///
 			case TileID.MinecartTrack:
 			case TileID.Torches:
 			case TileID.Rope:
@@ -85,8 +87,13 @@ namespace HouseFurnishingKit.Items {
 			case TileID.MagicalIceBlock:
 				return true;
 			default:
-				return TileGroupIdentityHelpers.VanillaShrubTiles.Contains( tile.type );
+				if( TileGroupIdentityHelpers.VanillaShrubTiles.Contains( tile.type ) ) {
+					return true;
+				}
+				break;
 			}
+
+			return !Main.tileSolid[ tile.type ];	// kinda broad
 		}
 
 
@@ -111,9 +118,11 @@ namespace HouseFurnishingKit.Items {
 			bool isStairOrNotSolid( int x, int y ) {
 				Tile tile = Main.tile[x, y];
 				return !tile.active()
-					|| ( !Main.tileSolid[tile.type] )   /*&& !Main.tileSolidTop[tile.type]*/
-					|| ( Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0 );  //stair
+					|| ( !Main.tileSolid[tile.type] )
+					|| ( Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0 )  //stair
+					|| HouseFurnishingKitItem.IsCleanableTile(tile, true);
 			}
+
 			bool isStairOrNotSolidOrNotDungeonWall( int x, int y ) {
 				Tile tile = Main.tile[x, y];
 				if( TileWallHelpers.UnsafeDungeonWallTypes.Contains( tile.wall ) || tile.wall == WallID.LihzahrdBrickUnsafe ) {

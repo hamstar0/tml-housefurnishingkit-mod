@@ -3,20 +3,23 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using System;
+using HamstarHelpers.Helpers.DotNET.Extensions;
+using HamstarHelpers.Helpers.Tiles;
 
 
 namespace HouseFurnishingKit.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
-		private static void CleanHouse( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {
+		private static void CleanHouse( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {	// Careful!
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
-				Tile tile = Main.tile[tileX, tileY];
-				if( !tile.active() ) { continue; }
-
-				if( HouseFurnishingKitItem.IsCleanableTile(tile) ) {
+				Tile tile = Main.tile[ tileX, tileY ];
+				if( HouseFurnishingKitItem.IsCleanableTile(tile, false) ) {
 					WorldGen.KillTile( tileX, tileY, false, false, true );
 				}
 			}
 		}
+
+
+		////////////////
 
 		private static void MakeHouseWalls( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
@@ -28,73 +31,77 @@ namespace HouseFurnishingKit.Items {
 			}
 		}
 
-		////
 
-		private static void MakeHouseTile4x2( ushort tileType, int tileX, int tileY ) {
-			for( int i = tileX; i < tileX + 4; i++ ) {
-				for( int j = tileY - 1; j <= tileY; j++ ) {
-					Main.tile[i, j].active( false );
+		////////////////
+
+		private static void MarkOccupiedTiles( int leftX, int topY, int width, int height, IDictionary<int, ISet<int>> occupiedTiles ) {
+			for( int x = leftX; x < leftX + width; x++ ) {
+				for( int y = topY; y < topY + height; y++ ) {
+					occupiedTiles.Set2D( x, y );
 				}
 			}
-			WorldGen.Place4x2( tileX, tileY, tileType, 1, 0 );
-		}
-
-		private static void MakeHouseTile3x2( ushort tileType, int tileX, int tileY ) {
-			for( int i = tileX - 2; i <= tileX; i++ ) {
-				for( int j = tileY - 1; j <= tileY; j++ ) {
-					Main.tile[i, j].active( false );
-				}
-			}
-			WorldGen.Place3x2( tileX - 1, tileY, tileType, 0 );
-		}
-
-		private static void MakeHouseTile2x1( ushort tileType, int tileX, int tileY ) {
-			Main.tile[tileX, tileY].active( false );
-			Main.tile[tileX+1, tileY].active( false );
-			WorldGen.PlaceTile( tileX, tileY, tileType );
-		}
-
-		private static void MakeHouseTile1x2( int tileType, int tileX, int tileY ) {
-			for( int j = tileY - 1; j <= tileY; j++ ) {
-				Main.tile[tileX - 1, j].active( false );
-			}
-
-			WorldGen.Place1x2( tileX, tileY, TileID.Chairs, 0 );
-			Main.tile[tileX, tileY - 1].frameX += 18;
-			Main.tile[tileX, tileY].frameX += 18;
 		}
 
 		////
 
-		private static void MakeHouseWallTile3x3( ushort tileType, int tileX, int tileY ) {
-			for( int i = tileX; i < tileX+3; i++ ) {
-				for( int j = tileY; j < tileY+3; j++ ) {
-					Main.tile[i, j].active( false );
-				}
-			}
-			WorldGen.Place3x3Wall( tileX, tileY, tileType, 0 );
+		private static void MakeHouseTile4x2( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+			TileHelpers.PlaceTile4x2( tileX, tileY, tileType, 1, 0 );
+			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 4, 2, occupiedTiles );
+		}
+
+		private static void MakeHouseTile3x2( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+			TileHelpers.PlaceTile3x2( tileX, tileY, tileType, 0 );
+			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 3, 2, occupiedTiles );
+		}
+
+		private static void MakeHouseTile2x1( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+			TileHelpers.PlaceTile2x1( tileX, tileY, tileType );
+			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 2, 1, occupiedTiles );
+		}
+
+		private static void MakeHouseTile1x2( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+			TileHelpers.PlaceTile1x2( tileX, tileY, tileType );
+			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 1, 2, occupiedTiles );
 		}
 
 		////
 
-		private static void MakeHouseCustomFurnishings( int leftTileX, int rightTileX, int tileY ) {
+		private static void MakeHouseWallTile3x3( ushort tileType, int tileX, int tileY, IDictionary<int, ISet<int>> occupiedTiles ) {
+			TileHelpers.PlaceTile3x3Wall( tileX, tileY, tileType, 0 );
+			HouseFurnishingKitItem.MarkOccupiedTiles( tileX, tileY, 3, 3, occupiedTiles );
+		}
+
+		////
+
+		private static void MakeHouseCustomFurnishings(
+					int leftTileX,
+					int rightTileX,
+					int floorY,
+					IDictionary<int, ISet<int>> occupiedTiles ) {
 			(ushort TileType, int Width, int Height) custFurniture = HouseFurnishingKitMod.Instance.CustomFurniture;
+
 			if( custFurniture.TileType != 0 ) {
 //Main.NewText( "placing CustomFurniture " + custFurniture.TileType );
 //Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
 				switch( custFurniture.TileType ) {
 				case TileID.Bottles:
+					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 2, TileID.Platforms );
+					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 3, custFurniture.TileType );
+					HouseFurnishingKitItem.MarkOccupiedTiles(	leftTileX + 5,	floorY - 2, 1, 2, occupiedTiles );
+					break;
 				case TileID.PiggyBank:
-					WorldGen.PlaceTile( leftTileX + 5, tileY, TileID.Platforms );
-					WorldGen.PlaceTile( leftTileX + 6, tileY, TileID.Platforms );
-					WorldGen.PlaceTile( leftTileX + 5, tileY - 1, custFurniture.TileType );
+					WorldGen.PlaceTile(					leftTileX + 5,	floorY - 2, TileID.Platforms );
+					WorldGen.PlaceTile(					leftTileX + 6,	floorY - 2, TileID.Platforms );
+					TileHelpers.PlaceTile2x1(			leftTileX + 5,	floorY - 3, custFurniture.TileType );
+					HouseFurnishingKitItem.MarkOccupiedTiles(	leftTileX + 5,	floorY - 2, 2, 2, occupiedTiles );
 					break;
 
 				default:
 					if( custFurniture.Width == 3 && custFurniture.Height == 2 ) {
-						HouseFurnishingKitItem.MakeHouseTile3x2( custFurniture.TileType, leftTileX + 5, tileY );
+						HouseFurnishingKitItem.MakeHouseTile3x2( custFurniture.TileType, leftTileX + 5, floorY - 2, occupiedTiles );
 					} else {
-						WorldGen.PlaceTile( leftTileX + 5, tileY, custFurniture.TileType );
+						WorldGen.PlaceTile(		leftTileX + 5,	floorY, custFurniture.TileType );
+						occupiedTiles.Set2D(	leftTileX + 5,	floorY );
 					}
 					break;
 				}
@@ -105,7 +112,7 @@ namespace HouseFurnishingKit.Items {
 //Main.NewText( "placing Custom3x3WallMount1 " + custWallMount1.TileType );
 //Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
 				if( custWallMount1.Width == 3 && custWallMount1.Height == 3 ) {
-					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, leftTileX, tileY - 3 );
+					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount1.TileType, leftTileX, floorY - 6, occupiedTiles );
 				}
 			}
 
@@ -114,9 +121,71 @@ namespace HouseFurnishingKit.Items {
 //Main.NewText( "placing Custom3x3WallMount2 " + custWallMount2.TileType );
 //Dust.NewDustPerfect( new Vector2(leftTileX<<4, tileY<<4), 1 );
 				if( custWallMount2.Width == 3 && custWallMount2.Height == 3 ) {
-					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount2.TileType, rightTileX - 1, tileY - 3 );
+					HouseFurnishingKitItem.MakeHouseWallTile3x3( custWallMount2.TileType, rightTileX - 3, floorY - 6, occupiedTiles );
 				}
 			}
+		}
+
+
+		////////////////
+
+		public static void MakeHouseTileNear(
+					ushort tileType,
+					int tileX,
+					int tileY,
+					IList<(ushort TileX, ushort TileY)> houseTiles,
+					IDictionary<int, ISet<int>> occupiedTiles ) {
+			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX, tileY, houseTiles, occupiedTiles) ) {
+				return;
+			}
+			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX, tileY - 1, houseTiles, occupiedTiles) ) {
+				return;
+			}
+			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX, tileY + 1, houseTiles, occupiedTiles) ) {
+				return;
+			}
+			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX - 1, tileY, houseTiles, occupiedTiles) ) {
+				return;
+			}
+			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX + 1, tileY, houseTiles, occupiedTiles) ) {
+				return;
+			}
+
+			if( !houseTiles.Contains( ((ushort)tileX, (ushort)(tileY - 1)) ) ) {
+				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX, tileY - 1, houseTiles, occupiedTiles );
+			}
+			if( houseTiles.Contains( ((ushort)tileX, (ushort)(tileY + 1)) ) ) {
+				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX, tileY + 1, houseTiles, occupiedTiles );
+			}
+			if( houseTiles.Contains( ((ushort)(tileX - 1), (ushort)tileY) ) ) {
+				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX - 1, tileY, houseTiles, occupiedTiles );
+			}
+			if( houseTiles.Contains( ((ushort)(tileX + 1), (ushort)tileY) ) ) {
+				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX + 1, tileY, houseTiles, occupiedTiles );
+			}
+		}
+
+		public static bool MakeHouseTileNearOnce(
+					ushort tileType,
+					int tileX,
+					int tileY,
+					IList<(ushort TileX, ushort TileY)> houseTiles,
+					IDictionary<int, ISet<int>> occupiedTiles ) {
+			if( occupiedTiles.Contains2D(tileX, tileY) ) {
+				return false;
+			}
+
+			// Regardless of outcome, this time must be marked
+			occupiedTiles.Set2D( tileX, tileY );
+
+			if( !houseTiles.Contains( ((ushort)tileX, (ushort)tileY) ) ) {
+				return false;
+			}
+
+			if( WorldGen.PlaceTile(tileX, tileY, tileType) ) {
+				return true;
+			}
+			return false;
 		}
 	}
 }
