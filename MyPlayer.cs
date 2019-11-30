@@ -4,9 +4,20 @@ using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.ModLoader;
+using HamstarHelpers.Classes.PlayerData;
+using HouseFurnishingKit.Protocols;
 
 
 namespace HouseFurnishingKit {
+	class Blah : CustomPlayerData {
+		protected override void OnEnter( object data ) {
+			CustomFurnitureProtocol.QuickRequest();
+		}
+	}
+
+
+
+
 	class HouseFurnishingKitPlayer : ModPlayer {
 		private int CurrentZoomedX;
 		private int CurrentZoomedY;

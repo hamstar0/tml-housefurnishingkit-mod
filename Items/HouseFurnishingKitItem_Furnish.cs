@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using System;
-
+using HamstarHelpers.Services.Timers;
 
 namespace HouseFurnishingKit.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
@@ -31,14 +31,17 @@ namespace HouseFurnishingKit.Items {
 			);
 
 			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
-			HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
-			HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds,				floorLeft,		floorY - 1,	occupiedTiles );
-			HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches,		floorRight - 2,	floorY,		occupiedTiles );
-			HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs,				floorRight - 3,	floorY - 1, 18, occupiedTiles );
-			HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft,		floorRight,		floorY, occupiedTiles );
-			HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,			topLeft.x,		topLeft.y, innerHouseSpace, occupiedTiles );
-			HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,			topRight.x,		topRight.y, innerHouseSpace, occupiedTiles );
-			
+
+			Timers.SetTimer( "HouseFurnishingKitPlacementDelay", 1, false, () => {
+				HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
+				HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds, floorLeft, floorY - 1, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches, floorRight - 2, floorY, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs, floorRight - 3, floorY - 1, 18, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft, floorRight, floorY, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches, topLeft.x, topLeft.y, innerHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches, topRight.x, topRight.y, innerHouseSpace, occupiedTiles );
+				return false;
+			} );
 		}
 
 

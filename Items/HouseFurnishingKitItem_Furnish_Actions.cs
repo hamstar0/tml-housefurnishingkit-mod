@@ -12,6 +12,7 @@ namespace HouseFurnishingKit.Items {
 		private static void CleanHouse( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {	// Careful!
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
 				Tile tile = Main.tile[ tileX, tileY ];
+
 				if( HouseFurnishingKitItem.IsCleanableTile(tile, false) ) {
 					WorldGen.KillTile( tileX, tileY, false, false, true );
 				}
