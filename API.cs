@@ -4,13 +4,18 @@ using Terraria;
 
 namespace HouseFurnishingKit {
 	public class HouseFurnishingKitAPI {
-		public static void OnHouseCreate( Action<int, int, Item> action ) {
-			HouseFurnishingKitMod.Instance.OnHouseCreate.Add( action );
+		public static void OnPreHouseCreate( Func<int, int, Item, bool> func ) {
+			HouseFurnishingKitMod.Instance.OnPreHouseCreate.Add( func );
 		}
 
 
+		public static void OnPostHouseCreate( Action<int, int, Item> action ) {
+			HouseFurnishingKitMod.Instance.OnPostHouseCreate.Add( action );
+		}
+
+		
 		public static void SetCustomFurniture( ushort tileType, int width, int height ) {
-			HouseFurnishingKitMod.Instance.CustomFurniture = (tileType, width, height);
+			HouseFurnishingKitMod.Instance.CustomFurniture = ( tileType, width, height );
 		}
 
 		public static void SetCustomWallMount1( ushort tileType, int width, int height ) {

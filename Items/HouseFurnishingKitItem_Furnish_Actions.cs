@@ -103,7 +103,6 @@ namespace HouseFurnishingKit.Items {
 					TileHelpers.PlaceTile2x1(			leftTileX + 4,	floorY - 2, custFurniture.TileType );
 					HouseFurnishingKitItem.MarkOccupiedTiles(	leftTileX + 5,	floorY - 2, 2, 2, occupiedTiles );
 					break;
-
 				default:
 					if( custFurniture.Width == 3 && custFurniture.Height == 2 ) {
 						HouseFurnishingKitItem.MakeHouseTile3x2( custFurniture.TileType, leftTileX + 4, floorY - 1, occupiedTiles );

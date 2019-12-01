@@ -93,7 +93,7 @@ namespace HouseFurnishingKit.Items {
 				break;
 			}
 
-			return !Main.tileSolid[ tile.type ];	// kinda broad
+			return !Main.tileSolid[ tile.type ] || Main.tileSolidTop[ tile.type ];	// kinda broad
 		}
 
 

@@ -23,7 +23,9 @@ namespace HouseFurnishingKit {
 		internal (ushort TileType, int Width, int Height) CustomFurniture = (0, 0, 0);
 		internal (ushort TileType, int Width, int Height) Custom3x3WallMount1 = (0, 0, 0);
 		internal (ushort TileType, int Width, int Height) Custom3x3WallMount2 = (0, 0, 0);
-		internal IList<Action<int, int, Item>> OnHouseCreate = new List<Action<int, int, Item>>();
+
+		internal IList<Func<int, int, Item, bool>> OnPreHouseCreate = new List<Func<int, int, Item, bool>>();
+		internal IList<Action<int, int, Item>> OnPostHouseCreate = new List<Action<int, int, Item>>();
 
 
 

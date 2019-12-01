@@ -59,9 +59,15 @@ namespace HouseFurnishingKit.Items {
 			);
 
 			if( state == HouseViabilityState.Good ) {
+				foreach( Func<int, int, Item, bool> func in HouseFurnishingKitMod.Instance.OnPreHouseCreate ) {
+					if( !func(tileX, tileY, this.item) ) {
+						return false;
+					}
+				}
+				
 				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY );
 
-				foreach( Action<int, int, Item> action in HouseFurnishingKitMod.Instance.OnHouseCreate ) {
+				foreach( Action<int, int, Item> action in HouseFurnishingKitMod.Instance.OnPostHouseCreate ) {
 					action( tileX, tileY, this.item );
 				}
 

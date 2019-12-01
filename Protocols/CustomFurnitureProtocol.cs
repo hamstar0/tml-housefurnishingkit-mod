@@ -56,17 +56,18 @@ namespace HouseFurnishingKit.Protocols {
 			HouseFurnishingKitAPI.SetCustomFurniture(
 				mymod.CustomFurniture.TileType,
 				mymod.CustomFurniture.Width,
-				mymod.CustomFurniture.Height );
-
+				mymod.CustomFurniture.Height
+			);
 			HouseFurnishingKitAPI.SetCustomWallMount1(
 				mymod.Custom3x3WallMount1.TileType,
 				mymod.Custom3x3WallMount1.Width,
-				mymod.Custom3x3WallMount1.Height );
-
+				mymod.Custom3x3WallMount1.Height
+			);
 			HouseFurnishingKitAPI.SetCustomWallMount2(
 				mymod.Custom3x3WallMount2.TileType,
 				mymod.Custom3x3WallMount2.Width,
-				mymod.Custom3x3WallMount2.Height );
+				mymod.Custom3x3WallMount2.Height
+			);
 		}
 	}
 }
