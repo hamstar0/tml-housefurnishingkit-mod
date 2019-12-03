@@ -36,15 +36,9 @@ namespace HouseFurnishingKit.Protocols {
 		protected override void InitializeServerSendData( int fromWho ) {
 			var mymod = HouseFurnishingKitMod.Instance;
 
-			this.CustomFurnitureTileType = mymod.CustomFurniture.TileType;
-			this.CustomFurnitureWidth = mymod.CustomFurniture.Width;
-			this.CustomFurnitureHeight = mymod.CustomFurniture.Height;
-			this.Custom3x3WallMount1TileType = mymod.Custom3x3WallMount1.TileType;
-			this.Custom3x3WallMount1Width = mymod.Custom3x3WallMount1.Width;
-			this.Custom3x3WallMount1Height = mymod.Custom3x3WallMount1.Height;
-			this.Custom3x3WallMount2TileType = mymod.Custom3x3WallMount2.TileType;
-			this.Custom3x3WallMount2Width = mymod.Custom3x3WallMount2.Width;
-			this.Custom3x3WallMount2Height = mymod.Custom3x3WallMount2.Height;
+			this.CustomFurnitureTileType = mymod.CustomFurniture;
+			this.Custom3x3WallMount1TileType = mymod.CustomWallMount1;
+			this.Custom3x3WallMount2TileType = mymod.CustomWallMount2;
 		}
 
 
@@ -53,21 +47,9 @@ namespace HouseFurnishingKit.Protocols {
 		protected override void ReceiveReply() {
 			var mymod = HouseFurnishingKitMod.Instance;
 
-			HouseFurnishingKitAPI.SetCustomFurniture(
-				mymod.CustomFurniture.TileType,
-				mymod.CustomFurniture.Width,
-				mymod.CustomFurniture.Height
-			);
-			HouseFurnishingKitAPI.SetCustomWallMount1(
-				mymod.Custom3x3WallMount1.TileType,
-				mymod.Custom3x3WallMount1.Width,
-				mymod.Custom3x3WallMount1.Height
-			);
-			HouseFurnishingKitAPI.SetCustomWallMount2(
-				mymod.Custom3x3WallMount2.TileType,
-				mymod.Custom3x3WallMount2.Width,
-				mymod.Custom3x3WallMount2.Height
-			);
+			HouseFurnishingKitAPI.SetCustomFurniture( mymod.CustomFurniture );
+			HouseFurnishingKitAPI.SetCustomWallMount1( mymod.CustomWallMount1 );
+			HouseFurnishingKitAPI.SetCustomWallMount2( mymod.CustomWallMount2 );
 		}
 	}
 }

@@ -65,11 +65,11 @@ namespace HouseFurnishingKit.Items {
 					}
 				}
 				
-				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY );
-
-				foreach( Action<int, int, Item> action in HouseFurnishingKitMod.Instance.OnPostHouseCreate ) {
-					action( tileX, tileY, this.item );
-				}
+				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY, () => {
+					foreach( Action<int, int, Item> action in HouseFurnishingKitMod.Instance.OnPostHouseCreate ) {
+						action( tileX, tileY, this.item );
+					}
+				} );
 
 				return true;
 			} else {

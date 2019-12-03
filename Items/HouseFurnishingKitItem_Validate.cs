@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using HamstarHelpers.Classes.Tiles.TilePattern;
 using HamstarHelpers.Helpers.Tiles;
+using HamstarHelpers.Helpers.Tiles.Walls;
 
 
 namespace HouseFurnishingKit.Items {
@@ -125,7 +126,7 @@ namespace HouseFurnishingKit.Items {
 
 			bool isStairOrNotSolidOrNotDungeonWall( int x, int y ) {
 				Tile tile = Main.tile[x, y];
-				if( TileWallHelpers.UnsafeDungeonWallTypes.Contains( tile.wall ) || tile.wall == WallID.LihzahrdBrickUnsafe ) {
+				if( TileWallGroupIdentityHelpers.UnsafeDungeonWallTypes.Contains( tile.wall ) || tile.wall == WallID.LihzahrdBrickUnsafe ) {
 					return false;
 				}
 				return isStairOrNotSolid( x, y );

@@ -5,6 +5,7 @@ using Terraria.ID;
 using System;
 using HamstarHelpers.Services.Timers;
 
+
 namespace HouseFurnishingKit.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		public static void MakeHouse(
@@ -12,7 +13,8 @@ namespace HouseFurnishingKit.Items {
 					IList<(ushort TileX, ushort TileY)> innerHouseSpace,
 					IList<(ushort TileX, ushort TileY)> fullHouseSpace,
 					int floorX,
-					int floorY ) {
+					int floorY,
+					Action onFinish ) {
 			(int x, int y) topLeft, topRight;
 			int floorLeft, floorRight;
 			(int x, int y) farTopLeft, farTopRight;
@@ -34,12 +36,13 @@ namespace HouseFurnishingKit.Items {
 
 			Timers.SetTimer( "HouseFurnishingKitPlacementDelay", 1, false, () => {
 				HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
-				HouseFurnishingKitItem.MakeHouseTile4x2( TileID.Beds, floorLeft, floorY - 1, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTile2x1( TileID.WorkBenches, floorRight - 2, floorY, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTile1x2( TileID.Chairs, floorRight - 3, floorY - 1, 18, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTile( floorLeft,		floorY,	TileID.Beds, 0, 1, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTile( floorRight - 2,	floorY,	TileID.WorkBenches, 0, -1, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTile( floorRight - 3,	floorY,	TileID.Chairs, 0, -1, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft, floorRight, floorY, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches, topLeft.x, topLeft.y, innerHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches, topRight.x, topRight.y, innerHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,	topLeft.x,	topLeft.y,	innerHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,	topRight.x,	topRight.y,	innerHouseSpace, occupiedTiles );
+				onFinish();
 				return false;
 			} );
 		}
