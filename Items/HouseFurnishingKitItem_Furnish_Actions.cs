@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
-using System;
+using Terraria.ObjectData;
 using HamstarHelpers.Helpers.DotNET.Extensions;
 using HamstarHelpers.Helpers.Tiles;
-using Terraria.ObjectData;
 using HamstarHelpers.Classes.Errors;
+using HamstarHelpers.Helpers.Debug;
 
 
 namespace HouseKits.Items {
@@ -15,7 +16,7 @@ namespace HouseKits.Items {
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
 				Tile tile = Main.tile[ tileX, tileY ];
 
-				if( HouseFurnishingKitItem.IsCleanableTile(tile, false) ) {
+				if( HouseFurnishingKitItem.IsCleanableTile(tile) ) {
 					tile.active( false );
 					tile.type = 0;
 					//WorldGen.KillTile( tileX, tileY, false, false, true );
@@ -127,40 +128,50 @@ namespace HouseKits.Items {
 
 		////////////////
 
-		public static void MakeHouseTileNear(
+		public static bool MakeHouseTileNear(
 					ushort tileType,
 					int tileX,
 					int tileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
 			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX, tileY, houseTiles, occupiedTiles) ) {
-				return;
+				return true;
 			}
 			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX, tileY - 1, houseTiles, occupiedTiles) ) {
-				return;
+				return true;
 			}
 			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX, tileY + 1, houseTiles, occupiedTiles) ) {
-				return;
+				return true;
 			}
 			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX - 1, tileY, houseTiles, occupiedTiles) ) {
-				return;
+				return true;
 			}
 			if( HouseFurnishingKitItem.MakeHouseTileNearOnce(tileType, tileX + 1, tileY, houseTiles, occupiedTiles) ) {
-				return;
+				return true;
+			}
+			
+			if( !occupiedTiles.Contains2D(tileX, tileY) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY - 1)) ) ) {
+				if( HouseFurnishingKitItem.MakeHouseTileNear(tileType, tileX, tileY - 1, houseTiles, occupiedTiles) ) {
+					return true;
+				}
+			}
+			if( !occupiedTiles.Contains2D(tileX, tileY) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY + 1)) ) ) {
+				if( HouseFurnishingKitItem.MakeHouseTileNear(tileType, tileX, tileY + 1, houseTiles, occupiedTiles) ) {
+					return true;
+				}
+			}
+			if( !occupiedTiles.Contains2D(tileX, tileY) && houseTiles.Contains( ((ushort)(tileX - 1), (ushort)tileY) ) ) {
+				if( HouseFurnishingKitItem.MakeHouseTileNear(tileType, tileX - 1, tileY, houseTiles, occupiedTiles) ) {
+					return true;
+				}
+			}
+			if( !occupiedTiles.Contains2D(tileX, tileY) && houseTiles.Contains( ((ushort)(tileX + 1), (ushort)tileY) ) ) {
+				if( HouseFurnishingKitItem.MakeHouseTileNear(tileType, tileX + 1, tileY, houseTiles, occupiedTiles) ) {
+					return true;
+				}
 			}
 
-			if( !houseTiles.Contains( ((ushort)tileX, (ushort)(tileY - 1)) ) ) {
-				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX, tileY - 1, houseTiles, occupiedTiles );
-			}
-			if( houseTiles.Contains( ((ushort)tileX, (ushort)(tileY + 1)) ) ) {
-				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX, tileY + 1, houseTiles, occupiedTiles );
-			}
-			if( houseTiles.Contains( ((ushort)(tileX - 1), (ushort)tileY) ) ) {
-				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX - 1, tileY, houseTiles, occupiedTiles );
-			}
-			if( houseTiles.Contains( ((ushort)(tileX + 1), (ushort)tileY) ) ) {
-				HouseFurnishingKitItem.MakeHouseTileNear( tileType, tileX + 1, tileY, houseTiles, occupiedTiles );
-			}
+			return false;
 		}
 
 		public static bool MakeHouseTileNearOnce(
@@ -180,10 +191,7 @@ namespace HouseKits.Items {
 				return false;
 			}
 
-			if( WorldGen.PlaceTile(tileX, tileY, tileType) ) {
-				return true;
-			}
-			return false;
+			return WorldGen.PlaceTile( tileX, tileY, tileType );
 		}
 	}
 }

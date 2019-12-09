@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
-using System;
 using HamstarHelpers.Services.Timers;
+using HamstarHelpers.Helpers.Debug;
 
 
 namespace HouseKits.Items {
@@ -34,7 +35,7 @@ namespace HouseKits.Items {
 
 			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
 
-			Timers.SetTimer( "HouseFurnishingKitPlacementDelay", 1, false, () => {
+			Timers.SetTimer( "HouseKitsFurnishingDelay", 1, false, () => {
 				HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
 				HouseFurnishingKitItem.MakeHouseTile( floorLeft,		floorY,	TileID.Beds, 0, 1, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseTile( floorRight - 2,	floorY,	TileID.WorkBenches, 0, -1, occupiedTiles );

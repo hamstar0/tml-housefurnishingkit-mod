@@ -22,20 +22,20 @@ namespace HouseKits.Items {
 
 			//
 
-			TileDrawDefinition placeFrame( int x, int y, bool solidOnly ) {
-				TileDrawDefinition myTileDef = solidOnly ? frameTileDef : null;
+			TileDrawDefinition placeSolidFrame( int x, int y ) {
+				TileDrawDefinition myTileDef = frameTileDef;
 				int offX = x - outerRect.X;
 				int offY = y - outerRect.Y;
 
 				if( offX == 0 || offX == width - 1 ) {
 					if( offY == (height - 2) ) {
-						myTileDef = solidOnly ? null : new TileDrawDefinition { TileType = TileID.ClosedDoor };
+						myTileDef = null;
 					} else if( offY >= (height - 4) && offY <= (height - 3) ) {
 						myTileDef = null;
 					}
 				} else if( offX >= (width / 2) - 3 && offX <= (width / 2) + 2 ) {
 					if( offY == 0 ) {
-						myTileDef = solidOnly ? null : new TileDrawDefinition { TileType = TileID.Platforms };
+						myTileDef = null;
 					}
 				}
 /*bool isActive = Main.tile[x, y].active();
@@ -48,11 +48,24 @@ Timers.SetTimer( "HFK0_"+x+"_"+y, 2, false, () => {
 				return myTileDef;
 			}
 
-			TileDrawDefinition placeSolidFrame( int x, int y ) {
-				return placeFrame( x, y, true );
-			}
 			TileDrawDefinition placeFeatures( int x, int y ) {
-				return placeFrame( x, y, false );
+				TileDrawDefinition myTileDef = null;
+				int offX = x - outerRect.X;
+				int offY = y - outerRect.Y;
+
+				if( offX == 0 || offX == width - 1 ) {
+					if( offY == (height - 2) ) {
+						myTileDef = new TileDrawDefinition { TileType = TileID.ClosedDoor };
+					} else if( offY >= (height - 4) && offY <= (height - 3) ) {
+						myTileDef = null;
+					}
+				} else if( offX >= (width / 2) - 3 && offX <= (width / 2) + 2 ) {
+					if( offY == 0 ) {
+						myTileDef = new TileDrawDefinition { TileType = TileID.Platforms };
+					}
+				}
+
+				return myTileDef;
 			}
 
 			//

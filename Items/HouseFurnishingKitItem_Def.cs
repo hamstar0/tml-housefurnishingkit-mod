@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
 using System;
 using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ModLoader;
+using HamstarHelpers.Helpers.Debug;
 
 
 namespace HouseKits.Items {
@@ -28,7 +29,7 @@ namespace HouseKits.Items {
 			this.item.useAnimation = 30;
 			//this.item.UseSound = SoundID.Item108;
 			this.item.maxStack = 1;
-			this.item.value = Item.buyPrice( 0, 10, 0, 0 );
+			this.item.value = HouseKitsConfig.Instance.HouseFurnishingKitPrice;
 			this.item.rare = 2;
 		}
 

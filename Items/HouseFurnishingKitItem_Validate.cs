@@ -7,6 +7,7 @@ using Terraria.ModLoader;
 using HamstarHelpers.Classes.Tiles.TilePattern;
 using HamstarHelpers.Helpers.Tiles;
 using HamstarHelpers.Helpers.Tiles.Walls;
+using HamstarHelpers.Services.Timers;
 
 
 namespace HouseKits.Items {
@@ -43,18 +44,15 @@ namespace HouseKits.Items {
 
 		////
 
-		public static bool IsCleanableTile( Tile tile, bool skipPlatforms ) {
+		public static bool IsCleanableTile( Tile tile ) {
 			if( !tile.active() ) {
 				return false;
 			}
 
 			switch( tile.type ) {
 			case TileID.Platforms:
-				if( !skipPlatforms ) {
-					return true;
-				}
-				break;
-			///
+				return tile.slope() != 0;
+			//
 			case TileID.MinecartTrack:
 			case TileID.Torches:
 			case TileID.Rope:
@@ -94,7 +92,8 @@ namespace HouseKits.Items {
 				break;
 			}
 
-			return !Main.tileSolid[ tile.type ] || Main.tileSolidTop[ tile.type ];	// kinda broad
+			return !Main.tileSolid[ tile.type ]
+				|| (tile.type != TileID.Platforms && Main.tileSolidTop[ tile.type ]);
 		}
 
 
@@ -117,19 +116,17 @@ namespace HouseKits.Items {
 					out int floorX,
 					out int floorY ) {
 			bool isStairOrNotSolid( int x, int y ) {
-				Tile tile = Main.tile[x, y];
+				Tile tile = Main.tile[ x, y ];
+				if( TileWallGroupIdentityHelpers.UnsafeDungeonWallTypes.Contains( tile.wall ) ) {
+					return false;
+				}
+				if( tile.wall == WallID.LihzahrdBrickUnsafe ) {
+					return false;
+				}
 				return !tile.active()
 					|| ( !Main.tileSolid[tile.type] )
 					|| ( Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0 )  //stair
-					|| HouseFurnishingKitItem.IsCleanableTile(tile, true);
-			}
-
-			bool isStairOrNotSolidOrNotDungeonWall( int x, int y ) {
-				Tile tile = Main.tile[x, y];
-				if( TileWallGroupIdentityHelpers.UnsafeDungeonWallTypes.Contains( tile.wall ) || tile.wall == WallID.LihzahrdBrickUnsafe ) {
-					return false;
-				}
-				return isStairOrNotSolid( x, y );
+					|| HouseFurnishingKitItem.IsCleanableTile( tile );
 			}
 
 			///
@@ -138,13 +135,15 @@ namespace HouseKits.Items {
 				CustomCheck = isStairOrNotSolid
 			} );
 			TilePattern fillPattern = new TilePattern( new TilePatternBuilder {
-				AreaFromCenter = new Rectangle( -2, -3, 4, 5 ),
+				AreaFromCenter = new Rectangle( -1, -1, 3, 3 ),
 				HasWater = false,
 				HasHoney = false,
 				HasLava = false,
 				IsActuated = false,
-				CustomCheck = isStairOrNotSolidOrNotDungeonWall
+				CustomCheck = isStairOrNotSolid
 			} );
+
+			//
 
 			HouseViabilityState state;
 
@@ -158,25 +157,49 @@ namespace HouseKits.Items {
 				floorX: out floorX,
 				floorY: out floorY
 			);
+
+			if( HouseKitsConfig.Instance.DebugModeInfo ) {
+				Main.NewText( "Full house space: " + fullHouseSpace.Count + " of 80" );
+			}
+
 			if( state != HouseViabilityState.Good ) {
 				innerHouseSpace = fullHouseSpace;
 				return state;
 			}
+
+			//
 
 			int altFloorY = floorY;
 			state = HouseFurnishingKitItem.IsValidHouseByCriteria(
 				pattern: fillPattern,
 				tileX: floorX,
 				tileY: tileY,
-				minimumVolume: 60,
+				minimumVolume: 40,
 				minimumFloorWidth: 12,
 				houseSpace: out innerHouseSpace,
 				floorX: out floorX,
 				floorY: out altFloorY
 			);
+
+			if( HouseKitsConfig.Instance.DebugModeInfo ) {
+				var myInnerHouseSpace = innerHouseSpace;
+				int timer = 120;
+
+				Timers.SetTimer( "HouseKitsInnerSpace", 2, false, () => {
+					foreach( (int x, int y) in myInnerHouseSpace ) {
+						Dust.QuickDust( new Point(x, y), Color.Lime );
+					}
+					return timer-- > 0;
+				} );
+
+				Main.NewText( "Inner house space: " + innerHouseSpace.Count + " of 60" );
+			}
+
 			if( state != HouseViabilityState.Good ) {
 				return state;
 			}
+
+			//
 
 			return state;
 		}
