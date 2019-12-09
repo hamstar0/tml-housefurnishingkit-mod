@@ -13,16 +13,8 @@ namespace HouseFurnishingKit.Protocols {
 		////////////////
 
 		public int CustomFurnitureTileType;
-		public int CustomFurnitureWidth;
-		public int CustomFurnitureHeight;
-
 		public int Custom3x3WallMount1TileType;
-		public int Custom3x3WallMount1Width;
-		public int Custom3x3WallMount1Height;
-
 		public int Custom3x3WallMount2TileType;
-		public int Custom3x3WallMount2Width;
-		public int Custom3x3WallMount2Height;
 
 
 
