@@ -5,15 +5,15 @@ using Terraria;
 using Terraria.ModLoader;
 
 
-namespace HouseFurnishingKit {
-	public class HouseFurnishingKitMod : Mod {
+namespace HouseKits {
+	public class HouseKitsMod : Mod {
 		public static string GithubUserName => "hamstar0";
 		public static string GithubProjectName => "tml-housefurnishingkit-mod";
 
 
 		////////////////
 
-		public static HouseFurnishingKitMod Instance { get; private set; }
+		public static HouseKitsMod Instance { get; private set; }
 
 
 
@@ -31,19 +31,19 @@ namespace HouseFurnishingKit {
 
 		////////////////
 
-		public HouseFurnishingKitMod() {
-			HouseFurnishingKitMod.Instance = this;
+		public HouseKitsMod() {
+			HouseKitsMod.Instance = this;
 		}
 
 		public override void Unload() {
-			HouseFurnishingKitMod.Instance = null;
+			HouseKitsMod.Instance = null;
 		}
 
 
 		////////////////
 
 		public override object Call( params object[] args ) {
-			return ModBoilerplateHelpers.HandleModCall( typeof(HouseFurnishingKitAPI), args );
+			return ModBoilerplateHelpers.HandleModCall( typeof(HouseKitsAPI), args );
 		}
 	}
 }

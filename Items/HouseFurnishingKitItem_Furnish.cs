@@ -6,7 +6,7 @@ using System;
 using HamstarHelpers.Services.Timers;
 
 
-namespace HouseFurnishingKit.Items {
+namespace HouseKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		public static void MakeHouse(
 					Player player,

@@ -9,7 +9,7 @@ using HamstarHelpers.Helpers.Tiles;
 using HamstarHelpers.Helpers.Tiles.Walls;
 
 
-namespace HouseFurnishingKit.Items {
+namespace HouseKits.Items {
 	public enum HouseViabilityState {
 		Good,
 		TooSmall,

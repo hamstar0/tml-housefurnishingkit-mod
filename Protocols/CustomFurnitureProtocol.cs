@@ -2,7 +2,7 @@
 using System;
 
 
-namespace HouseFurnishingKit.Protocols {
+namespace HouseKits.Protocols {
 	class CustomFurnitureProtocol : PacketProtocolRequestToServer {
 		public static void QuickRequest() {
 			PacketProtocolRequestToServer.QuickRequest<CustomFurnitureProtocol>( -1 );
@@ -26,7 +26,7 @@ namespace HouseFurnishingKit.Protocols {
 		////////////////
 
 		protected override void InitializeServerSendData( int fromWho ) {
-			var mymod = HouseFurnishingKitMod.Instance;
+			var mymod = HouseKitsMod.Instance;
 
 			this.CustomFurnitureTileType = mymod.CustomFurniture;
 			this.Custom3x3WallMount1TileType = mymod.CustomWallMount1;
@@ -37,11 +37,11 @@ namespace HouseFurnishingKit.Protocols {
 		////////////////
 
 		protected override void ReceiveReply() {
-			var mymod = HouseFurnishingKitMod.Instance;
+			var mymod = HouseKitsMod.Instance;
 
-			HouseFurnishingKitAPI.SetCustomFurniture( mymod.CustomFurniture );
-			HouseFurnishingKitAPI.SetCustomWallMount1( mymod.CustomWallMount1 );
-			HouseFurnishingKitAPI.SetCustomWallMount2( mymod.CustomWallMount2 );
+			HouseKitsAPI.SetCustomFurniture( mymod.CustomFurniture );
+			HouseKitsAPI.SetCustomWallMount1( mymod.CustomWallMount1 );
+			HouseKitsAPI.SetCustomWallMount2( mymod.CustomWallMount2 );
 		}
 	}
 }

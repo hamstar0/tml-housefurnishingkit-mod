@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using HamstarHelpers.Helpers.Tiles;
 
 
-namespace HouseFurnishingKit.Items {
+namespace HouseKits.Items {
 	public partial class HouseFramingKitItem : ModItem {
 		public readonly static int ItemWidth = 24;
 		public readonly static int ItemHeight = 22;

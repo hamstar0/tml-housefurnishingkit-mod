@@ -9,7 +9,7 @@ using Terraria.ObjectData;
 using HamstarHelpers.Classes.Errors;
 
 
-namespace HouseFurnishingKit.Items {
+namespace HouseKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		private static void CleanHouse( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {	// Careful!
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
@@ -61,7 +61,7 @@ namespace HouseFurnishingKit.Items {
 //	Dust.NewDustPerfect( new Vector2((leftTileX<<4) + 8, (floorTileY<<4) + 8), 1, default(Vector2) );
 //	return BLAH++ < 100;
 //} );
-			if( !TilePlacementHelpers.Place(leftTileX, floorTileY, tileType, 0, direction) ) {
+			if( !TilePlacementHelpers.PlaceObject(leftTileX, floorTileY, tileType, 0, direction) ) {
 				if( !TilePlacementHelpers.TryPrecisePlace(leftTileX, floorTileY, tileType, style, direction) ) {
 					if( !WorldGen.PlaceTile(leftTileX, floorTileY, tileType ) ) {
 						throw new ModHelpersException( "Could not place tile "
@@ -93,7 +93,7 @@ namespace HouseFurnishingKit.Items {
 					int rightTileX,
 					int floorTileY,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
-			ushort custFurnType = HouseFurnishingKitMod.Instance.CustomFurniture;
+			ushort custFurnType = HouseKitsMod.Instance.CustomFurniture;
 			
 			if( custFurnType != 0 ) {
 				switch( custFurnType ) {
@@ -113,12 +113,12 @@ namespace HouseFurnishingKit.Items {
 				}
 			}
 
-			ushort custWallMount1 = HouseFurnishingKitMod.Instance.CustomWallMount1;
+			ushort custWallMount1 = HouseKitsMod.Instance.CustomWallMount1;
 			if( custWallMount1 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseWallTile3x3( leftTileX, floorTileY - 4, custWallMount1, occupiedTiles );
 			}
 
-			ushort custWallMount2 = HouseFurnishingKitMod.Instance.CustomWallMount2;
+			ushort custWallMount2 = HouseKitsMod.Instance.CustomWallMount2;
 			if( custWallMount2 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseWallTile3x3( rightTileX - 3, floorTileY - 4, custWallMount2, occupiedTiles );
 			}

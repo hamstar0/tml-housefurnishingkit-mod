@@ -5,7 +5,7 @@ using System;
 using Microsoft.Xna.Framework;
 
 
-namespace HouseFurnishingKit.Items {
+namespace HouseKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		public static int Width = 24;
 		public static int Height = 22;
@@ -59,14 +59,14 @@ namespace HouseFurnishingKit.Items {
 			);
 
 			if( state == HouseViabilityState.Good ) {
-				foreach( Func<int, int, Item, bool> func in HouseFurnishingKitMod.Instance.OnPreHouseCreate ) {
+				foreach( Func<int, int, Item, bool> func in HouseKitsMod.Instance.OnPreHouseCreate ) {
 					if( !func(tileX, tileY, this.item) ) {
 						return false;
 					}
 				}
 				
 				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY, () => {
-					foreach( Action<int, int, Item> action in HouseFurnishingKitMod.Instance.OnPostHouseCreate ) {
+					foreach( Action<int, int, Item> action in HouseKitsMod.Instance.OnPostHouseCreate ) {
 						action( tileX, tileY, this.item );
 					}
 				} );

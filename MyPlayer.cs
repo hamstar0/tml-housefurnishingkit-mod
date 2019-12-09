@@ -1,15 +1,15 @@
-﻿using HouseFurnishingKit.Items;
+﻿using HouseKits.Items;
 using HamstarHelpers.Helpers.Debug;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.ModLoader;
 using HamstarHelpers.Classes.PlayerData;
-using HouseFurnishingKit.Protocols;
+using HouseKits.Protocols;
 
 
-namespace HouseFurnishingKit {
-	class HouseFurnishingKitCustomPlayer : CustomPlayerData {
+namespace HouseKits {
+	class HouseKitsCustomPlayer : CustomPlayerData {
 		protected override void OnEnter( object data ) {
 			if( Main.netMode == 1 ) {
 				CustomFurnitureProtocol.QuickRequest();
