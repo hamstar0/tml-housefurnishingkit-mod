@@ -2,7 +2,7 @@
 using Terraria.ModLoader;
 using System;
 using Microsoft.Xna.Framework;
-using HamstarHelpers.Helpers.Tiles;
+using System.Collections.Generic;
 
 
 namespace HouseKits.Items {
@@ -50,11 +50,8 @@ namespace HouseKits.Items {
 			int tileX = (int)player.Center.X >> 4;
 			int tileY = (int)player.position.Y >> 4;
 
-			while( !TileHelpers.IsSolid(Main.tile[tileX, tileY], true, true) ) {
-				tileY++;
-			}
-
-			bool canErect = HouseFramingKitItem.Validate( tileX, tileY );
+			ISet<(int, int)> _;
+			bool canErect = HouseFramingKitItem.Validate( ref tileX, ref tileY, out _ );
 
 			if( canErect ) {
 				HouseFramingKitItem.MakeHouseFrame( tileX, tileY );
