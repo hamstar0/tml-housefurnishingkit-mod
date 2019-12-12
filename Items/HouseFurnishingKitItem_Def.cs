@@ -8,8 +8,8 @@ using HamstarHelpers.Helpers.Debug;
 
 namespace HouseKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
-		public static int Width = 24;
-		public static int Height = 22;
+		public static int Width = 36;
+		public static int Height = 28;
 
 
 
