@@ -82,7 +82,12 @@ namespace HouseKits.Items {
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topRight.x,		topRight.y, fullHouseSpace, occupiedTiles );
 
 				if( HouseKitsConfig.Instance.CustomFloorTile > 0 ) {
-					HouseFurnishingKitItem.ChangeFlooring( HouseKitsConfig.Instance.CustomFloorTile, floorLeft, floorLeft, floorY );
+					HouseFurnishingKitItem.ChangeFlooring(
+						HouseKitsConfig.Instance.CustomFloorTile,
+						floorLeft,
+						floorRight,
+						floorY
+					);
 				}
 				onFinish();
 				return false;

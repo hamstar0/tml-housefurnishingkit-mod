@@ -318,8 +318,8 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 
 
 		public static void ChangeFlooring( ushort tileType, int leftX, int rightX, int floorY ) {
-			for( int i=leftX; i<rightX; i++ ) {
-				Main.tile[ i, floorY ].type = tileType;
+			for( int i=leftX-1; i<rightX+2; i++ ) {
+				Main.tile[ i, floorY + 1 ].type = tileType;
 			}
 		}
 	}
