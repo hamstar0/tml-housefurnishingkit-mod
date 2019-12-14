@@ -31,9 +31,12 @@ namespace HouseKits.Items {
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
 				Tile tile = Main.tile[tileX, tileY];
 
-				if( !Main.wallHouse[tile.wall] ) {
-					WorldGen.PlaceWall( tileX, tileY, WallID.Wood, true );
-				}
+				tile.wall = 0;
+				tile.wallFrameX( 0 );
+				tile.wallFrameY( 0 );
+				//if( !Main.wallHouse[tile.wall] ) {
+				WorldGen.PlaceWall( tileX, tileY, WallID.Wood, true );
+				//}
 			}
 		}
 
@@ -133,7 +136,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 			if( custWallMount1 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
-						if( y >= floorTileY - 3 ) { return false; }
+						if( y >= floorTileY - 4 ) { return false; }
 						return HouseFurnishingKitItem.MakeHouseWallTile3x3( x, y, custWallMount1, occupiedTiles );
 					},
 					leftTileX,
@@ -147,7 +150,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 			if( custWallMount2 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
-						if( y >= floorTileY - 3 ) { return false; }
+						if( y >= floorTileY - 4 ) { return false; }
 						return HouseFurnishingKitItem.MakeHouseWallTile3x3( x, y, custWallMount2, occupiedTiles );
 					},
 					rightTileX - 3,

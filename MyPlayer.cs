@@ -5,19 +5,17 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
-using HamstarHelpers.Classes.PlayerData;
-using HouseKits.Protocols;
 using HouseKits.Items;
 
 
 namespace HouseKits {
-	class HouseKitsCustomPlayer : CustomPlayerData {
+	/*class HouseKitsCustomPlayer : CustomPlayerData {
 		protected override void OnEnter( object data ) {
 			if( Main.netMode == 1 ) {
 				CustomFurnitureProtocol.QuickRequest();
 			}
 		}
-	}
+	}*/
 
 
 
