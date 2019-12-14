@@ -35,14 +35,55 @@ namespace HouseKits.Items {
 
 			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
 
+			//
+
+			bool checkPlacement( int x, int y, int width ) {
+				for( int x2 = x; x2 < x+width; x2++ ) {
+					for( int y2 = y; y2 >= y-3; y2-- ) {
+						if( Main.tile[x2, y2].active() && Main.tileSolid[Main.tile[x2, y2].type] ) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool placeBed( int x, int y ) {
+				if( !checkPlacement( x, y, 4 ) ) {
+					return false;
+				}
+				return HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Beds, 0, 1, fullHouseSpace, occupiedTiles );
+			}
+			bool placeWorkbench( int x, int y ) {
+				if( !checkPlacement(x, y, 2) ) {
+					return false;
+				}
+				return HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.WorkBenches, 0, 1, fullHouseSpace, occupiedTiles );
+			}
+			bool placeChair( int x, int y ) {
+				if( !checkPlacement(x, y, 1) ) {
+					return false;
+				}
+				return HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Chairs, 0, 1, fullHouseSpace, occupiedTiles );
+			}
+			bool placeTorch( int x, int y ) {
+				return WorldGen.PlaceTile( x, y, TileID.Torches );
+			}
+
+			//
+
 			Timers.SetTimer( "HouseKitsFurnishingDelay", 1, false, () => {
 				HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
-				HouseFurnishingKitItem.MakeHouseTile( floorLeft,		floorY,	TileID.Beds, 0, 1, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTile( floorRight - 2,	floorY,	TileID.WorkBenches, 0, -1, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTile( floorRight - 3,	floorY,	TileID.Chairs, 0, -1, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft, floorRight, floorY, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,	topLeft.x,	topLeft.y,	innerHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( TileID.Torches,	topRight.x,	topRight.y,	innerHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeBed,			floorLeft,		floorY, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeWorkbench,	floorRight - 2,	floorY, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeChair,		floorRight - 3,	floorY, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseCustomFurnishings(			floorLeft,		floorRight, floorY, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topLeft.x,		topLeft.y, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topRight.x,		topRight.y, fullHouseSpace, occupiedTiles );
+
+				if( HouseKitsConfig.Instance.CustomFloorTile > 0 ) {
+					HouseFurnishingKitItem.ChangeFlooring( HouseKitsConfig.Instance.CustomFloorTile, floorLeft, floorLeft, floorY );
+				}
 				onFinish();
 				return false;
 			} );

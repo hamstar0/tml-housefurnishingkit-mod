@@ -14,6 +14,7 @@ namespace HouseKits.Items {
 	public enum HouseViabilityState {
 		Good,
 		TooSmall,
+		TooSmallInner,
 		TooLarge,
 		SmallFloor
 	}
@@ -22,14 +23,21 @@ namespace HouseKits.Items {
 
 
 	public partial class HouseFurnishingKitItem : ModItem {
-		public static string GetViabilityStateMessage( HouseViabilityState state, out Color color ) {
+		public static string GetViabilityStateMessage(
+					HouseViabilityState state,
+					int fullSpace,
+					int innerSpace,
+					out Color color ) {
 			switch( state ) {
 			case HouseViabilityState.Good:
 				color = Color.Lime;
 				return "Valid town house space found. Note: Only above ground houses are automatically occupied.";
 			case HouseViabilityState.TooSmall:
 				color = Color.Yellow;
-				return "House too small.";
+				return "House too small ("+fullSpace+" of "+HouseKitsConfig.Instance.MinimumFurnishableHouseArea+" blocks needed).";
+			case HouseViabilityState.TooSmallInner:
+				color = Color.Yellow;
+				return "House too small inside ("+innerSpace+" of "+(HouseKitsConfig.Instance.MinimumFurnishableHouseArea/2)+" blocks needed).";
 			case HouseViabilityState.TooLarge:
 				color = Color.Yellow;
 				return "House too large or not a closed space.";
@@ -151,8 +159,8 @@ namespace HouseKits.Items {
 				pattern: formPattern,
 				tileX: tileX,
 				tileY: tileY,
-				minimumVolume: 80,
-				minimumFloorWidth: 12,
+				minimumVolume: HouseKitsConfig.Instance.MinimumFurnishableHouseArea,	//80
+				minimumFloorWidth: HouseKitsConfig.Instance.MinimumFurnishableHouseFloorWidth,//12
 				houseSpace: out fullHouseSpace,
 				floorX: out floorX,
 				floorY: out floorY
@@ -196,7 +204,9 @@ namespace HouseKits.Items {
 			}
 
 			if( state != HouseViabilityState.Good ) {
-				return state;
+				return state == HouseViabilityState.TooSmall
+					? HouseViabilityState.TooSmallInner
+					: state;
 			}
 
 			//

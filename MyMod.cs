@@ -20,10 +20,6 @@ namespace HouseKits {
 
 		////////////////
 
-		internal ushort CustomFurniture = 0;
-		internal ushort CustomWallMount1 = 0;
-		internal ushort CustomWallMount2 = 0;
-
 		internal IList<Func<int, int, Item, bool>> OnPreHouseCreate = new List<Func<int, int, Item, bool>>();
 		internal IList<Action<int, int, Item>> OnPostHouseCreate = new List<Action<int, int, Item>>();
 

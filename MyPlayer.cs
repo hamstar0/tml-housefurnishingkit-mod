@@ -112,7 +112,7 @@ namespace HouseKits {
 					this.HasPreviousHouseViableAlert = true;
 
 					Color color;
-					string msg = HouseFurnishingKitItem.GetViabilityStateMessage( HouseViabilityState.Good, out color );
+					string msg = HouseFurnishingKitItem.GetViabilityStateMessage( HouseViabilityState.Good, 0, 0, out color );
 
 					Main.NewText( msg, color );
 				}

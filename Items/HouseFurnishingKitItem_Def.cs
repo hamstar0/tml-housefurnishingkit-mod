@@ -75,7 +75,7 @@ namespace HouseKits.Items {
 				return true;
 			} else {
 				Color color;
-				String msg = HouseFurnishingKitItem.GetViabilityStateMessage( state, out color );
+				String msg = HouseFurnishingKitItem.GetViabilityStateMessage( state, fullHouseSpace.Count, innerHouseSpace.Count, out color );
 
 				Main.NewText( msg, color );
 			}
