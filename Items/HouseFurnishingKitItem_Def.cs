@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
 
 
-namespace HouseKits.Items {
+namespace PrefabKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		public static int Width = 36;
 		public static int Height = 28;
@@ -29,7 +29,7 @@ namespace HouseKits.Items {
 			this.item.useAnimation = 30;
 			//this.item.UseSound = SoundID.Item108;
 			this.item.maxStack = 1;
-			this.item.value = HouseKitsConfig.Instance.HouseFurnishingKitPrice;
+			this.item.value = PrefabKitsConfig.Instance.HouseFurnishingKitPrice;
 			this.item.rare = 2;
 		}
 
@@ -60,14 +60,14 @@ namespace HouseKits.Items {
 			);
 
 			if( state == HouseViabilityState.Good ) {
-				foreach( Func<int, int, Item, bool> func in HouseKitsMod.Instance.OnPreHouseCreate ) {
+				foreach( Func<int, int, Item, bool> func in PrefabKitsMod.Instance.OnPreHouseCreate ) {
 					if( !func(tileX, tileY, this.item) ) {
 						return false;
 					}
 				}
 				
 				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY, () => {
-					foreach( Action<int, int, Item> action in HouseKitsMod.Instance.OnPostHouseCreate ) {
+					foreach( Action<int, int, Item> action in PrefabKitsMod.Instance.OnPostHouseCreate ) {
 						action( tileX, tileY, this.item );
 					}
 				} );

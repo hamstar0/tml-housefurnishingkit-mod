@@ -8,7 +8,7 @@ using HamstarHelpers.Classes.Tiles.TilePattern;
 using HamstarHelpers.Helpers.Tiles;
 
 
-namespace HouseKits.Items {
+namespace PrefabKits.Items {
 	public partial class HouseFramingKitItem : ModItem {
 		public static bool Validate( ref int tileX, ref int tileY, out ISet<(int, int)> tiles ) {
 			int width = HouseFramingKitItem.FrameWidth;

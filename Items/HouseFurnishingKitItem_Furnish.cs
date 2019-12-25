@@ -7,7 +7,7 @@ using HamstarHelpers.Services.Timers;
 using HamstarHelpers.Helpers.Debug;
 
 
-namespace HouseKits.Items {
+namespace PrefabKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		public static void MakeHouse(
 					Player player,
@@ -81,9 +81,9 @@ namespace HouseKits.Items {
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topLeft.x,		topLeft.y, fullHouseSpace, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topRight.x,		topRight.y, fullHouseSpace, occupiedTiles );
 
-				if( HouseKitsConfig.Instance.CustomFloorTile > 0 ) {
+				if( PrefabKitsConfig.Instance.CustomFloorTile > 0 ) {
 					HouseFurnishingKitItem.ChangeFlooring(
-						HouseKitsConfig.Instance.CustomFloorTile,
+						PrefabKitsConfig.Instance.CustomFloorTile,
 						floorLeft,
 						floorRight,
 						floorY

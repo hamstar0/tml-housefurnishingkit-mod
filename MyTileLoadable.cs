@@ -3,8 +3,8 @@ using HamstarHelpers.Classes.Loadable;
 using HamstarHelpers.Services.Hooks.ExtendedHooks;
 
 
-namespace HouseKits {
-	class HouseKitsTileLoadable : ILoadable {
+namespace PrefabKits {
+	class PrefabKitsTileLoadable : ILoadable {
 		public bool IsCreatingHouse { get; private set; }
 
 
@@ -12,12 +12,12 @@ namespace HouseKits {
 		////////////////
 
 		public void OnModsLoad() {
-			HouseKitsAPI.OnPreHouseCreate( ( tileX, tileY, item ) => {
+			PrefabKitsAPI.OnPreHouseCreate( ( tileX, tileY, item ) => {
 				this.IsCreatingHouse = true;
 				return true;
 			} );
 
-			HouseKitsAPI.OnPostHouseCreate( ( tileX, tileY, item ) => {
+			PrefabKitsAPI.OnPostHouseCreate( ( tileX, tileY, item ) => {
 				this.IsCreatingHouse = false;
 			} );
 

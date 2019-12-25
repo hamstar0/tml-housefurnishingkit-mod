@@ -7,7 +7,7 @@ using Terraria.ID;
 using Microsoft.Xna.Framework;
 
 
-namespace HouseKits.Items {
+namespace PrefabKits.Items {
 	public partial class HouseFramingKitItem : ModItem {
 		public static void MakeHouseFrame( int tileX, int tileY ) {
 			int width = HouseFramingKitItem.FrameWidth;

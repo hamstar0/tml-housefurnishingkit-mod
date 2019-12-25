@@ -5,9 +5,9 @@ using Terraria;
 using System.ComponentModel;
 
 
-namespace HouseKits {
-	public class HouseKitsConfig : StackableModConfig {
-		public static HouseKitsConfig Instance => ModConfigStack.GetMergedConfigs<HouseKitsConfig>();
+namespace PrefabKits {
+	public class PrefabKitsConfig : StackableModConfig {
+		public static PrefabKitsConfig Instance => ModConfigStack.GetMergedConfigs<PrefabKitsConfig>();
 
 
 

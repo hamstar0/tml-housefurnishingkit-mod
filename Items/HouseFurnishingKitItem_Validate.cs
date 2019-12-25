@@ -10,7 +10,7 @@ using HamstarHelpers.Helpers.Tiles.Walls;
 using HamstarHelpers.Services.Timers;
 
 
-namespace HouseKits.Items {
+namespace PrefabKits.Items {
 	public enum HouseViabilityState {
 		Good,
 		TooSmall,
@@ -34,10 +34,10 @@ namespace HouseKits.Items {
 				return "Valid town house space found. Note: Only above ground houses are automatically occupied.";
 			case HouseViabilityState.TooSmall:
 				color = Color.Yellow;
-				return "House too small ("+fullSpace+" of "+HouseKitsConfig.Instance.MinimumFurnishableHouseArea+" blocks needed).";
+				return "House too small ("+fullSpace+" of "+PrefabKitsConfig.Instance.MinimumFurnishableHouseArea+" blocks needed).";
 			case HouseViabilityState.TooSmallInner:
 				color = Color.Yellow;
-				return "House too small inside ("+innerSpace+" of "+(HouseKitsConfig.Instance.MinimumFurnishableHouseArea/2)+" blocks needed).";
+				return "House too small inside ("+innerSpace+" of "+(PrefabKitsConfig.Instance.MinimumFurnishableHouseArea/2)+" blocks needed).";
 			case HouseViabilityState.TooLarge:
 				color = Color.Yellow;
 				return "House too large or not a closed space.";
@@ -159,14 +159,14 @@ namespace HouseKits.Items {
 				pattern: formPattern,
 				tileX: tileX,
 				tileY: tileY,
-				minimumVolume: HouseKitsConfig.Instance.MinimumFurnishableHouseArea,	//80
-				minimumFloorWidth: HouseKitsConfig.Instance.MinimumFurnishableHouseFloorWidth,//12
+				minimumVolume: PrefabKitsConfig.Instance.MinimumFurnishableHouseArea,	//80
+				minimumFloorWidth: PrefabKitsConfig.Instance.MinimumFurnishableHouseFloorWidth,//12
 				houseSpace: out fullHouseSpace,
 				floorX: out floorX,
 				floorY: out floorY
 			);
 
-			if( HouseKitsConfig.Instance.DebugModeInfo ) {
+			if( PrefabKitsConfig.Instance.DebugModeInfo ) {
 				Main.NewText( "Full house space: " + fullHouseSpace.Count + " of 80" );
 			}
 
@@ -189,7 +189,7 @@ namespace HouseKits.Items {
 				floorY: out altFloorY
 			);
 
-			if( HouseKitsConfig.Instance.DebugModeInfo ) {
+			if( PrefabKitsConfig.Instance.DebugModeInfo ) {
 				var myInnerHouseSpace = innerHouseSpace;
 				int timer = 120;
 

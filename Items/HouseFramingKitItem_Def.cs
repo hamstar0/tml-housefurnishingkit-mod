@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 
-namespace HouseKits.Items {
+namespace PrefabKits.Items {
 	public partial class HouseFramingKitItem : ModItem {
 		public readonly static int ItemWidth = 24;
 		public readonly static int ItemHeight = 22;
@@ -31,7 +31,7 @@ namespace HouseKits.Items {
 			this.item.useAnimation = 30;
 			//this.item.UseSound = SoundID.Item108;
 			this.item.maxStack = 1;
-			this.item.value = HouseKitsConfig.Instance.HouseFramingKitPrice;
+			this.item.value = PrefabKitsConfig.Instance.HouseFramingKitPrice;
 			this.item.rare = 2;
 		}
 

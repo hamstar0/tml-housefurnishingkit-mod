@@ -5,11 +5,11 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
-using HouseKits.Items;
+using PrefabKits.Items;
 
 
-namespace HouseKits {
-	/*class HouseKitsCustomPlayer : CustomPlayerData {
+namespace PrefabKits {
+	/*class PrefabKitsCustomPlayer : CustomPlayerData {
 		protected override void OnEnter( object data ) {
 			if( Main.netMode == 1 ) {
 				CustomFurnitureProtocol.QuickRequest();
@@ -20,7 +20,7 @@ namespace HouseKits {
 
 
 
-	class HouseFurnishingKitPlayer : ModPlayer {
+	class PrefabKitsPlayer : ModPlayer {
 		private int CurrentZoomedX;
 		private int CurrentZoomedY;
 
@@ -43,7 +43,7 @@ namespace HouseKits {
 				}
 			}
 
-			if( HouseKitsConfig.Instance.DebugModeInfo ) {
+			if( PrefabKitsConfig.Instance.DebugModeInfo ) {
 				if( Main.mouseRight && Main.mouseRightRelease ) {
 					Tile tile = Main.tile[
 						(int)(Main.screenPosition.X + Main.mouseX) / 16,
