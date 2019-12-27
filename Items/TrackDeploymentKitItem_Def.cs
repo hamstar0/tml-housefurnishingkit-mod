@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using PrefabKits.Protocols;
 using Terraria;
 using Terraria.ModLoader;
+using PrefabKits.Tiles;
 
 
 namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
-		public const int ItemWidth = 24;
-		public const int ItemHeight = 24;
-
-		public readonly static int FrameWidth = 16;
-		public readonly static int FrameHeight = 8;
+		public const int ItemWidth = 32;
+		public const int ItemHeight = 32;
 
 
 
@@ -22,26 +17,30 @@ namespace PrefabKits.Items {
 			this.DisplayName.SetDefault( "Track Deployment Kit" );
 			this.Tooltip.SetDefault( "Deploys a train rail spool in the direction you're facing"
 				+"\nPlaces rails as close to the ground as it can contiguously"
-				+"\nContains 100 tracks" );
+				+"\nPlaces "+PrefabKitsConfig.Instance.TrackDeploymentKitTracks+" tracks" );
 		}
 
 		public override void SetDefaults() {
-			this.item.width = HouseFramingKitItem.ItemWidth;
-			this.item.height = HouseFramingKitItem.ItemHeight;
+			this.item.width = TrackDeploymentKitItem.ItemWidth;
+			this.item.height = TrackDeploymentKitItem.ItemHeight;
+			this.item.maxStack = 99;
+			this.item.useTurn = true;
+			//this.item.autoReuse = true;
+			this.item.useAnimation = 15;
+			this.item.useTime = 10;
+			this.item.useStyle = 1;
 			this.item.consumable = true;
-			this.item.useStyle = 4;
-			this.item.useTime = 30;
-			this.item.useAnimation = 30;
-			//this.item.UseSound = SoundID.Item108;
-			this.item.maxStack = 1;
+			this.item.createTile = ModContent.TileType<TrackDeploymentTile>();
+			this.item.placeStyle = 0;
 			this.item.value = PrefabKitsConfig.Instance.TrackDeploymentKitTracks * 100;
+			//this.item.UseSound = SoundID.Item108;
 			this.item.rare = 2;
 		}
 
 
 		////////////////
 
-		public override bool UseItem( Player player ) {
+		/*public override bool UseItem( Player player ) {
 			if( player.itemAnimation > 0 && player.itemTime == 0 ) {
 				player.itemTime = item.useTime;
 				return true;
@@ -50,18 +49,43 @@ namespace PrefabKits.Items {
 		}
 
 		public override bool ConsumeItem( Player player ) {
-			int tileX = Main.mouseX;
-			int tileY = Main.mouseY;
+			this.item.createTile = -1;
 
-			if( Main.netMode != 2 && Main.myPlayer == player.whoAmI ) {
-				TrackDeploymentKitItem.Deploy( Main.LocalPlayer.direction == 1, tileX, tileY );
-
-				if( Main.netMode == 1 ) {
-					TrackDeploymentProtocol.BroadcastFromClient( Main.LocalPlayer.direction == 1, tileX, tileY );
+			if( player.whoAmI != Main.myPlayer ) {
+				return base.ConsumeItem( player );
+			}
+			
+			bool isFacingRight = player.direction == 1;
+			int tileX = Main.mouseX + (int)Main.screenPosition.X;
+			int tileY = Main.mouseY + (int)Main.screenPosition.Y;
+			tileX = tileX >> 4;
+			tileY = tileY >> 4;
+			
+			if( Main.tile[tileX, tileY]?.active() == true ) {
+				if( Main.tile[tileX, tileY].type != TileID.MinecartTrack ) {
+					return false;
 				}
 			}
+			if( Main.tile[tileX, tileY-1]?.active() != true
+				&& Main.tile[tileX, tileY+1]?.active() != true
+				&& Main.tile[tileX-1, tileY]?.active() != true
+				&& Main.tile[tileX+1, tileY]?.active() != true ) {
+				return false;
+			}
 
+			if( Main.netMode != 2 && Main.myPlayer == player.whoAmI ) {
+				TrackDeploymentKitItem.Deploy( isFacingRight, tileX, tileY );
+
+				if( Main.netMode == 1 ) {
+					TrackDeploymentProtocol.BroadcastFromClient( isFacingRight, tileX, tileY );
+				}
+			}
+			
 			return true;
 		}
+
+		public override void OnConsumeItem( Player player ) {
+			this.item.createTile = 1;
+		}*/
 	}
 }

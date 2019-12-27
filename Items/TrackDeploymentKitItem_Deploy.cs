@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HamstarHelpers.Services.Timers;
+using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -6,7 +8,6 @@ using Terraria.ModLoader;
 namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
 		public static void Deploy( bool isAimedRight, int tileX, int tileY ) {
-
 		}
 	}
 }
