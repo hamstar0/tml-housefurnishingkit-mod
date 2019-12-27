@@ -32,6 +32,11 @@ namespace PrefabKits {
 
 
 		[Range( 0, 9999 )]
+		[DefaultValue( 100 )]
+		public int TrackDeploymentKitTracks { get; set; } = 100;
+
+
+		[Range( 0, 9999 )]
 		public ushort CustomFurnitureTile { get; set; } = 0;
 
 		[Range( 0, 9999 )]

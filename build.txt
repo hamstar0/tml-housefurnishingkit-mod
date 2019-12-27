@@ -1,4 +1,4 @@
-displayName = House Kits
+displayName = Prefab Kits
 author = hamstar
 version = 1.0.0
 modReferences = HamstarHelpers@5.4.0
