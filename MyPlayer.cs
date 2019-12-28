@@ -3,8 +3,10 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Helpers.Players;
 using PrefabKits.Items;
 
 
@@ -55,17 +57,22 @@ namespace PrefabKits {
 		}
 		
 		private void PreUpdateLocal() {
-			int frameKitItemType = ModContent.ItemType<HouseFramingKitItem>();
-			int furnishKitItemType = ModContent.ItemType<HouseFurnishingKitItem>();
-
 			if( this.UpdateZoomedPosition() ) {
+				int furnishKitItemType = ModContent.ItemType<HouseFurnishingKitItem>();
+
 				if( this.player.inventory.Any( i => ((i?.active == true) && (i.type == furnishKitItemType)) ) ) {
 					this.CheckFurnishableHouse();
 				}
 			}
 			
-			if( this.player.HeldItem?.active == true && this.player.HeldItem.type == frameKitItemType ) {
-				this.CheckFrameableHouse();
+			if( this.player.HeldItem?.active == true ) {
+				int heldItemType = this.player.HeldItem.type;
+
+				if( heldItemType == ModContent.ItemType<HouseFramingKitItem>() ) {
+					this.CheckFrameableHouse();
+				} else if( heldItemType == ModContent.ItemType<TrackDeploymentKitItem>() ) {
+					this.CheckTrackKitResume( heldItemType );
+				}
 			}
 		}
 
@@ -142,6 +149,34 @@ namespace PrefabKits {
 				);
 				dust.noGravity = true;
 				dust.noLight = true;
+			}
+		}
+
+
+		private void CheckTrackKitResume( int heldTrackKitItemType ) {
+			if( !this.player.mount.Active || !this.player.mount.Cart ) {
+				return;
+			}
+
+			var trackKitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
+			(int x, int y, int dir) resume = trackKitSingleton.ResumeDeploymentAt;
+			var resumeWldPos = new Vector2( (resume.x << 4) + 8, (resume.y << 4) + 8 );
+
+			if( Vector2.DistanceSquared(this.player.Center, resumeWldPos) >= 4096 ) { // 4 tiles
+				return;
+			}
+
+			PlayerItemHelpers.RemoveInventoryItemQuantity( this.player, heldTrackKitItemType, 1 );
+
+			int leftovers = TrackDeploymentKitItem.Redeploy();
+			if( leftovers == 0 ) {
+				return;
+			}
+
+			int itemWho = Item.NewItem( resumeWldPos, ItemID.MinecartTrack, leftovers );
+
+			if( Main.netMode != 1 ) {
+				NetMessage.SendData( MessageID.SyncItem, -1, -1, null, itemWho, 1f );
 			}
 		}
 	}

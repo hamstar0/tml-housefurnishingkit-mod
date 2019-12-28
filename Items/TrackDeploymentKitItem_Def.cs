@@ -13,6 +13,12 @@ namespace PrefabKits.Items {
 
 		////////////////
 
+		public (int TileX, int TileY, int dir) ResumeDeploymentAt { get; private set; }
+
+
+
+		////////////////
+
 		public override void SetStaticDefaults() {
 			this.DisplayName.SetDefault( "Track Deployment Kit" );
 			this.Tooltip.SetDefault( "Deploys a train rail spool in the direction you're facing"

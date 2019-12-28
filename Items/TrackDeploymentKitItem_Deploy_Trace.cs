@@ -8,7 +8,11 @@ using HamstarHelpers.Helpers.Debug;
 
 namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
-		private static IList<(int, int)> TracePath( int tileX, int tileY, int dir, int tracks ) {
+		private static IList<(int, int)> TracePath(
+					int tileX,
+					int tileY,
+					int dir,
+					int tracks ) {
 			if( Main.tile[tileX, tileY]?.active() == true ) {
 				return new List<(int, int)>();
 			}
@@ -19,6 +23,7 @@ namespace PrefabKits.Items {
 			PathTree pathTree = TrackDeploymentKitItem.TracePathTree( tileX, tileY, dir, 0, tracks, pathMap );
 
 			TrackDeploymentKitItem.TraceTreeForLongestPath( pathTree, path );
+
 			return path;
 		}
 

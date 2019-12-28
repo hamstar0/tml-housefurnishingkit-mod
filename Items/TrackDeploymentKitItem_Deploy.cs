@@ -13,19 +13,42 @@ namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
 		public static int Deploy( bool isAimedRight, int tileX, int tileY ) {
 			int tracks = PrefabKitsConfig.Instance.TrackDeploymentKitTracks;
-			int tracksScount = tracks + (tracks / 2);
+			int tracksScanRange = tracks + (tracks / 2);
 
 			int dir = isAimedRight ? 1 : -1;
 
-			IList<(int, int)> path = TrackDeploymentKitItem.TracePath( tileX, tileY, dir, tracksScount );
+			IList<(int, int)> path = TrackDeploymentKitItem.TracePath( tileX, tileY, dir, tracksScanRange );
 
-			TrackDeploymentKitItem.DeployRunner( path, tracks );
+			if( path.Count > 0 ) {
+				TrackDeploymentKitItem.DeployRunner( path, tracks, 0, (x, y) => {
+					if( Main.tile[x, y]?.active() == true ) { return; }
 
-			return tracks - path.Count;
+					var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
+					kitSingleton.ResumeDeploymentAt = (x, y, dir);
+				} );
+			}
+
+			return Math.Max( tracks - path.Count, 0 );
+		}
+
+		public static int Redeploy() {
+			var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
+			(int x, int y, int dir) resume = kitSingleton.ResumeDeploymentAt;
+/*int blah=120;
+Timers.SetTimer( "blah_"+resume.x+"_"+resume.y, 3, false, () => {
+	Dust.QuickDust( new Point(resume.x,resume.y), Color.Red );
+	return blah-- > 0;
+} );*/
+
+			kitSingleton.ResumeDeploymentAt = (0, 0, 0);
+
+			return TrackDeploymentKitItem.Deploy( resume.dir > 0, resume.x, resume.y );
 		}
 
 
-		public static void DeployRunner( IList<(int x, int y)> path, int trackMax, int trackNum=0 ) {
+		////
+
+		public static void DeployRunner( IList<(int x, int y)> path, int trackMax, int trackNum, Action<int, int> onLastTrack ) {
 			int x = path[trackNum].x;
 			int y = path[trackNum].y;
 /*int blah=120;
@@ -47,11 +70,20 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 				}
 			}
 
-			if( trackNum < trackMax - 1 && trackNum < path.Count - 1 ) {
-				Timers.SetTimer( "PrefabKitsTrackDeploy_"+path.GetHashCode(), 7, false, () => {
-					TrackDeploymentKitItem.DeployRunner( path, trackMax, trackNum + 1 );
+			int lastTrackIdx = trackMax < path.Count
+				? trackMax - 1
+				: path.Count - 1;
+
+			if( trackNum < (lastTrackIdx - 1) ) {
+				Timers.SetTimer( "PrefabKitsTrackDeploy_" + path.GetHashCode(), 7, false, () => {
+					TrackDeploymentKitItem.DeployRunner( path, trackMax, trackNum + 1, onLastTrack );
 					return false;
 				} );
+			} else {
+				if( trackMax < path.Count ) {	// if path cuts this short, do not run event
+					(int x, int y) lastPathNode = path[ trackNum + 1 ];
+					onLastTrack( lastPathNode.x, lastPathNode.y );
+				}
 			}
 		}
 
