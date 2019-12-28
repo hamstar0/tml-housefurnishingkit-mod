@@ -72,19 +72,30 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 				return tree;
 			}
 
-			PathTree createTree( int x, int y, int newVerticalDir ) {
-				PathTree mytree = new PathTree {
+			PathTree createTree( int x, int y, int oldVerticalDir, int newVerticalDir ) {
+				var mytree = new PathTree {
 					TileX = x,
 					TileY = y,
 					HighestDepthCount = 0
 				};
 
-				if( pathMap.TryGetValue( (x, y), out mytree ) ) {
+				if( (oldVerticalDir == 1 && newVerticalDir == -1) || (oldVerticalDir == -1 && newVerticalDir == 1) ) {
 					return mytree;
 				}
 
+				if( pathMap.ContainsKey( (x, y) ) ) {
+					return pathMap[ (x, y) ];
+				}
+
 				if( Main.tile[x, y]?.active() != true || Main.tile[x, y].type == TileID.MinecartTrack ) {
-					mytree = TrackDeploymentKitItem.TracePathTree( x, y, horizontalDir, newVerticalDir, tracks - 1, pathMap );
+					mytree = TrackDeploymentKitItem.TracePathTree(
+						x,
+						y,
+						horizontalDir,
+						newVerticalDir,
+						tracks - 1,
+						pathMap
+					);
 				}
 
 				pathMap[ (x, y) ] = mytree;
@@ -92,9 +103,9 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 				return mytree;
 			}
 
-			tree.Bot = createTree( tileX + horizontalDir,	tileY + 1,	1 );
-			tree.Mid = createTree( tileX + horizontalDir,	tileY,		0 );
-			tree.Top = createTree( tileX + horizontalDir,	tileY - 1,	-1 );
+			tree.Bot = createTree( tileX + horizontalDir,	tileY + 1,	verticalDir,	1 );
+			tree.Mid = createTree( tileX + horizontalDir,	tileY,		verticalDir,	0 );
+			tree.Top = createTree( tileX + horizontalDir,	tileY - 1,	verticalDir,	-1 );
 			
 			if( tree.Bot.HighestDepthCount >= tree.Top.HighestDepthCount ) {
 				if( tree.Bot.HighestDepthCount >= tree.Mid.HighestDepthCount ) {
@@ -127,9 +138,12 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 					path.Add( (pathTree.Top.TileX, pathTree.Top.TileY) );
 					TrackDeploymentKitItem.TraceTreeForLongestPath( pathTree.Top, path );
 				}
-			} else {
+			} else if( pathTree.Mid.HighestDepthCount >= pathTree.Top.HighestDepthCount ) {
 				path.Add( (pathTree.Mid.TileX, pathTree.Mid.TileY) );
 				TrackDeploymentKitItem.TraceTreeForLongestPath( pathTree.Mid, path );
+			} else {
+				path.Add( (pathTree.Top.TileX, pathTree.Top.TileY) );
+				TrackDeploymentKitItem.TraceTreeForLongestPath( pathTree.Top, path );
 			}
 		}
 

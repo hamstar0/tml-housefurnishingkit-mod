@@ -12,7 +12,7 @@ using PrefabKits.Protocols;
 namespace PrefabKits.Tiles {
 	class TrackDeploymentTile : ModTile {
 		public override void SetDefaults() {
-			var flags = AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile;
+			var flags = AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile | AnchorType.SolidWithTop;
 
 			Main.tileFrameImportant[this.Type] = true;
 
