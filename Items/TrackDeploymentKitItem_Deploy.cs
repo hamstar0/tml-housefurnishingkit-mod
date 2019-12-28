@@ -20,13 +20,15 @@ namespace PrefabKits.Items {
 
 			int i = 0;
 			foreach( (int x, int y) in path ) {
-				WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
-				WorldGen.SquareTileFrame( x, y );
-int blah=120;
+				if( Main.tile[x, y]?.type != TileID.MinecartTrack ) {
+					WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
+					WorldGen.SquareTileFrame( x, y );
+				}
+/*int blah=120;
 Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 	Dust.QuickDust( new Point(x,y), Color.Red );
 	return blah-- > 0;
-} );
+} );*/
 
 				if( i++ >= tracks ) {
 					break;
@@ -71,18 +73,17 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 			}
 
 			PathTree createTree( int x, int y, int newVerticalDir ) {
-				PathTree mytree;
+				PathTree mytree = new PathTree {
+					TileX = x,
+					TileY = y,
+					HighestDepthCount = 0
+				};
+
 				if( pathMap.TryGetValue( (x, y), out mytree ) ) {
 					return mytree;
 				}
 
-				if( Main.tile[x, y]?.active() == true ) {
-					mytree = new PathTree {
-						TileX = x,
-						TileY = y,
-						HighestDepthCount = 0
-					};
-				} else {
+				if( Main.tile[x, y]?.active() != true || Main.tile[x, y].type == TileID.MinecartTrack ) {
 					mytree = TrackDeploymentKitItem.TracePathTree( x, y, horizontalDir, newVerticalDir, tracks - 1, pathMap );
 				}
 
