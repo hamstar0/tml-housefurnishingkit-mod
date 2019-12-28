@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -116,9 +117,17 @@ namespace PrefabKits.Tiles {
 
 			Main.tile[i, j].ClearTile();
 
-			TrackDeploymentKitItem.Deploy( isFacingRight, i, j );
+			int leftovers = TrackDeploymentKitItem.Deploy( isFacingRight, i, j );
+			int itemWho = -1;
+			if( leftovers > 0 ) {
+				itemWho = Item.NewItem( new Vector2((i<<4)+8, (j<<4)+8), ItemID.MinecartTrack, leftovers );
+			}
 
 			if( Main.netMode == 1 ) {
+				if( itemWho != -1 ) {
+					NetMessage.SendData( MessageID.SyncItem, -1, -1, null, itemWho, 1f );
+				}
+
 				TrackDeploymentProtocol.BroadcastFromClient( isFacingRight, i, j );
 			}
 		}
