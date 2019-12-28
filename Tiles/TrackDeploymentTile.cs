@@ -12,13 +12,23 @@ using PrefabKits.Protocols;
 namespace PrefabKits.Tiles {
 	class TrackDeploymentTile : ModTile {
 		public override void SetDefaults() {
-			var flags = AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile | AnchorType.SolidWithTop;
+			//var flags = AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile | AnchorType.SolidWithTop;
 
 			Main.tileFrameImportant[this.Type] = true;
 
 			TileObjectData.newTile.CopyFrom( TileObjectData.Style1x1 );
 			TileObjectData.newTile.StyleHorizontal = true;
-			TileObjectData.newTile.AnchorBottom = new AnchorData( flags, TileObjectData.newTile.Width, 0 );
+			TileObjectData.newTile.AnchorBottom = AnchorData.Empty;
+			TileObjectData.newTile.AnchorWall = true;
+			TileObjectData.newTile.UsesCustomCanPlace = true;
+			//
+			TileObjectData.newAlternate.CopyFrom( TileObjectData.Style1x1 );
+			TileObjectData.newAlternate.StyleHorizontal = true;
+			TileObjectData.newAlternate.AnchorBottom = AnchorData.Empty;
+			TileObjectData.newAlternate.AnchorWall = false;
+			TileObjectData.newAlternate.UsesCustomCanPlace = true;
+			TileObjectData.addAlternate( 1 );
+			/*TileObjectData.newTile.AnchorBottom = new AnchorData( flags, TileObjectData.newTile.Width, 0 );
 			TileObjectData.newTile.AnchorAlternateTiles = new[] { (int)TileID.MinecartTrack };
 			//
 			TileObjectData.newAlternate.CopyFrom( TileObjectData.Style1x1 );
@@ -47,9 +57,57 @@ namespace PrefabKits.Tiles {
 			TileObjectData.newAlternate.AnchorWall = true;
 			TileObjectData.newAlternate.AnchorBottom = AnchorData.Empty;
 			TileObjectData.newAlternate.AnchorAlternateTiles = new[] { (int)TileID.MinecartTrack };
-			TileObjectData.addAlternate( 0 );
+			TileObjectData.addAlternate( 0 );*/
 			//
 			TileObjectData.addTile( this.Type );
+		}
+
+
+		public override bool CanPlace( int i, int j ) {
+			if( i > 0 ) {
+				if( j > 0 ) {
+					if( Main.tile[i - 1, j - 1]?.active() == true ) {
+						return true;
+					}
+				}
+				if( Main.tile[i - 1, j]?.active() == true ) {
+					return true;
+				}
+				if( j < Main.maxTilesY - 1 ) {
+					if( Main.tile[i - 1, j + 1]?.active() == true ) {
+						return true;
+					}
+				}
+			}
+
+			if( j > 0 ) {
+				if( Main.tile[i, j - 1]?.active() == true ) {
+					return true;
+				}
+			}
+			if( j < Main.maxTilesY - 1 ) {
+				if( Main.tile[i, j + 1]?.active() == true ) {
+					return true;
+				}
+			}
+
+			if( i < Main.maxTilesX - 1 ) {
+				if( j > 0 ) {
+					if( Main.tile[i + 1, j - 1]?.active() == true ) {
+						return true;
+					}
+				}
+				if( Main.tile[i + 1, j]?.active() == true ) {
+					return true;
+				}
+				if( j < Main.maxTilesY - 1 ) {
+					if( Main.tile[i + 1, j + 1]?.active() == true ) {
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 
 

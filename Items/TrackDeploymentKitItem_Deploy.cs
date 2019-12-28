@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
-using HamstarHelpers.Services.Timers;
 
 
 namespace PrefabKits.Items {
@@ -20,15 +18,15 @@ namespace PrefabKits.Items {
 
 			int i = 0;
 			foreach( (int x, int y) in path ) {
-				if( Main.tile[x, y]?.type != TileID.MinecartTrack ) {
-					WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
-					WorldGen.SquareTileFrame( x, y );
-				}
 /*int blah=120;
 Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 	Dust.QuickDust( new Point(x,y), Color.Red );
 	return blah-- > 0;
 } );*/
+				if( Main.tile[x, y]?.type != TileID.MinecartTrack ) {
+					WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
+					WorldGen.SquareTileFrame( x, y );
+				}
 
 				if( i++ >= tracks ) {
 					break;
@@ -44,7 +42,7 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 				return new List<(int, int)>();
 			}
 
-			IList<(int, int)> path = new List<(int, int)>();
+			IList<(int, int)> path = new List<(int, int)> { (tileX, tileY) };
 			IDictionary<(int, int), PathTree> pathMap = new Dictionary<(int, int), PathTree>();
 
 			PathTree pathTree = TrackDeploymentKitItem.TracePathTree( tileX, tileY, dir, 0, tracks, pathMap );
