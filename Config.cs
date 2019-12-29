@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader.Config;
 using HamstarHelpers.Services.Configs;
-using Terraria;
-using System.ComponentModel;
 
 
 namespace PrefabKits {
@@ -31,9 +33,20 @@ namespace PrefabKits {
 		public int HouseFurnishingKitPrice { get; set; } = 100000;  //Item.buyPrice( 0, 10, 0, 0 );
 
 
+		[DefaultValue( true )]
+		public bool TrackDeploymentKitEnabled { get; set; } = true;
+		
 		[Range( 0, 9999 )]
 		[DefaultValue( 100 )]
 		public int TrackDeploymentKitTracks { get; set; } = 100;
+
+		[Range( -1, 9999 )]
+		[DefaultValue( TileID.WorkBenches )]
+		public int TrackDeploymentKitRecipeTile { get; set; } = TileID.WorkBenches;
+
+		public List<ItemDefinition> TrackDeploymentKitRecipeExtraIngredient { get; set; } = new List<ItemDefinition> {
+			new ItemDefinition( ItemID.GrapplingHook )
+		};
 
 
 		[Range( 0, 9999 )]
