@@ -8,6 +8,7 @@ using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
 using HamstarHelpers.Helpers.Players;
 using PrefabKits.Items;
+using PrefabKits.Protocols;
 
 
 namespace PrefabKits {
@@ -177,6 +178,8 @@ namespace PrefabKits {
 
 			if( Main.netMode != 1 ) {
 				NetMessage.SendData( MessageID.SyncItem, -1, -1, null, itemWho, 1f );
+			} else {
+				TrackDeploymentProtocol.BroadcastFromClient( resume.dir > 0, resume.x, resume.y, true );
 			}
 		}
 	}

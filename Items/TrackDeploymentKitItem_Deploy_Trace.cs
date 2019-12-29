@@ -4,10 +4,24 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Classes.Tiles.TilePattern;
+using Microsoft.Xna.Framework;
 
 
 namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
+		private static TilePattern TrackValid = new TilePattern( new TilePatternBuilder {
+			AreaFromCenter = new Rectangle( 0, -3, 1, 5 ),
+			HasLava = false,
+			CustomCheck = (x, y) => {
+				return Main.tile[x, y]?.active() != true || Main.tile[x, y].type == TileID.MinecartTrack;
+			}
+		} );
+
+
+
+		////////////////
+
 		private static IList<(int, int)> TracePath(
 					int tileX,
 					int tileY,
@@ -61,7 +75,7 @@ namespace PrefabKits.Items {
 					return pathMap[ (x, y) ];
 				}
 
-				if( Main.tile[x, y]?.active() != true || Main.tile[x, y].type == TileID.MinecartTrack ) {
+				if( TrackDeploymentKitItem.TrackValid.Check(x, y) ) {
 					mytree = TrackDeploymentKitItem.TracePathTree(
 						x,
 						y,

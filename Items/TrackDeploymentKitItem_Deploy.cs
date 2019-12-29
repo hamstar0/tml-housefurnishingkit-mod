@@ -13,14 +13,14 @@ namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
 		public static int Deploy( bool isAimedRight, int tileX, int tileY ) {
 			int tracks = PrefabKitsConfig.Instance.TrackDeploymentKitTracks;
-			int tracksScanRange = tracks + (tracks / 2);
+			int tracksScanRange = tracks + ( tracks / 2 );
 
 			int dir = isAimedRight ? 1 : -1;
 
 			IList<(int, int)> path = TrackDeploymentKitItem.TracePath( tileX, tileY, dir, tracksScanRange );
 
 			if( path.Count > 0 ) {
-				TrackDeploymentKitItem.DeployRunner( path, tracks, 0, (x, y) => {
+				TrackDeploymentKitItem.DeployRunner( path, tracks, 0, ( x, y ) => {
 					if( Main.tile[x, y]?.active() == true ) { return; }
 
 					var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
@@ -29,6 +29,13 @@ namespace PrefabKits.Items {
 			}
 
 			return Math.Max( tracks - path.Count, 0 );
+		}
+
+		public static int ForceRedeploy( bool isAimedRight, int tileX, int tileY ) {
+			var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
+			kitSingleton.ResumeDeploymentAt = (0, 0, 0);
+
+			return TrackDeploymentKitItem.Deploy( isAimedRight, tileX, tileY );
 		}
 
 		public static int Redeploy() {
@@ -51,11 +58,18 @@ Timers.SetTimer( "blah_"+resume.x+"_"+resume.y, 3, false, () => {
 		public static void DeployRunner( IList<(int x, int y)> path, int trackMax, int trackNum, Action<int, int> onLastTrack ) {
 			int x = path[trackNum].x;
 			int y = path[trackNum].y;
-/*int blah=120;
-Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
-	Dust.QuickDust( new Point(x,y), Color.Red );
-	return blah-- > 0;
-} );*/
+			/*int blah=120;
+			Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
+				Dust.QuickDust( new Point(x,y), Color.Red );
+				return blah-- > 0;
+			} );*/
+			if( Main.tile[x, y]?.active() == true ) {
+				if( Main.tile[x, y]?.type != TileID.MinecartTrack ) {
+					TrackDeploymentKitItem.DropLeftovers( trackMax - trackNum, x, y );
+					return;
+				}
+			}
+
 			if( Main.tile[x, y]?.type != TileID.MinecartTrack ) {
 				WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
 				WorldGen.SquareTileFrame( x, y );
@@ -74,14 +88,14 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 				? trackMax - 1
 				: path.Count - 1;
 
-			if( trackNum < (lastTrackIdx - 1) ) {
+			if( trackNum < ( lastTrackIdx - 1 ) ) {
 				Timers.SetTimer( "PrefabKitsTrackDeploy_" + path.GetHashCode(), 7, false, () => {
 					TrackDeploymentKitItem.DeployRunner( path, trackMax, trackNum + 1, onLastTrack );
 					return false;
 				} );
 			} else {
-				if( trackMax < path.Count ) {	// if path cuts this short, do not run event
-					(int x, int y) lastPathNode = path[ trackNum + 1 ];
+				if( trackMax < path.Count ) {   // if path cuts this short, do not run event
+					(int x, int y) lastPathNode = path[trackNum + 1];
 					onLastTrack( lastPathNode.x, lastPathNode.y );
 				}
 			}
@@ -92,10 +106,11 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 			bool findBottomY( out int lowest ) {
 				for( lowest = tileY; lowest < tileY + 128; lowest++ ) {
 					Tile tile = Main.tile[tileX, lowest];
+					if( tile.wall != 0 ) { break; }
+
 					if( tile?.active() != true ) { continue; }
-					if( tile.type == TileID.MinecartTrack ) { continue; }
 					if( !Main.tileSolid[tile.type] ) { continue; }
-					if( tile.wall == 0 ) { continue; }
+					if( Main.tileSolidTop[tile.type] ) { continue; }
 
 					break;
 				}
@@ -104,7 +119,7 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 			}
 
 			int bottom;
-			if( !findBottomY(out bottom) ) {
+			if( !findBottomY( out bottom ) ) {
 				return;
 			}
 
@@ -116,6 +131,22 @@ Timers.SetTimer( "blah_"+x+"_"+y, 3, false, () => {
 			for( int y = bottom; y >= tileY; y-- ) {
 				if( Main.tile[tileX, y]?.wall == 0 ) {
 					WorldGen.PlaceWall( tileX, y, WallID.RichMahoganyFence );
+				}
+			}
+		}
+
+
+		////////////////
+
+		public static void DropLeftovers( int leftovers, int tileX, int tileY ) {
+			int itemWho = -1;
+			if( leftovers > 0 ) {
+				itemWho = Item.NewItem( new Vector2((tileX<<4) + 8, (tileY<<4) + 8), ItemID.MinecartTrack, leftovers );
+			}
+
+			if( Main.netMode == 1 ) {
+				if( itemWho != -1 ) {
+					NetMessage.SendData( MessageID.SyncItem, -1, -1, null, itemWho, 1f );
 				}
 			}
 		}
