@@ -131,9 +131,14 @@ namespace PrefabKits.Items {
 				if( tile.wall == WallID.LihzahrdBrickUnsafe ) {
 					return false;
 				}
-				return !tile.active()
-					|| ( !Main.tileSolid[tile.type] )
-					|| ( Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0 )  //stair
+				if( !tile.active() ) {
+					return true;
+				}
+				if( tile.type == TileID.OpenDoor || tile.type == TileID.TallGateOpen || tile.type == TileID.TrapdoorOpen ) {
+					return false;
+				}
+				return !Main.tileSolid[tile.type]
+					|| (Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0)  //stair
 					|| HouseFurnishingKitItem.IsCleanableTile( tile );
 			}
 

@@ -19,7 +19,10 @@ namespace PrefabKits.Items {
 
 		public override void SetStaticDefaults() {
 			this.DisplayName.SetDefault( "House Framing Kit" );
-			this.Tooltip.SetDefault( "Attempts to erect a skeletal house frame" );
+			this.Tooltip.SetDefault(
+				"Attempts to erect a skeletal house frame"
+				+"\nFor use when no existing house structure is available"
+			);
 		}
 
 		public override void SetDefaults() {
