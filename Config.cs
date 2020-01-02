@@ -38,12 +38,15 @@ namespace PrefabKits {
 		
 		[Range( 0, 9999 )]
 		[DefaultValue( 100 )]
+		[ReloadRequired]
 		public int TrackDeploymentKitTracks { get; set; } = 100;
 
 		[Range( -1, 9999 )]
 		[DefaultValue( TileID.WorkBenches )]
+		[ReloadRequired]
 		public int TrackDeploymentKitRecipeTile { get; set; } = TileID.WorkBenches;
 
+		[ReloadRequired]
 		public List<ItemDefinition> TrackDeploymentKitRecipeExtraIngredient { get; set; } = new List<ItemDefinition> {
 			new ItemDefinition( ItemID.GrapplingHook )
 		};
