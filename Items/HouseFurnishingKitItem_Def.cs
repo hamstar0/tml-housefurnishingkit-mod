@@ -18,7 +18,7 @@ namespace PrefabKits.Items {
 		public override void SetStaticDefaults() {
 			this.DisplayName.SetDefault( "House Furnishing Kit" );
 			this.Tooltip.SetDefault(
-				"Attempts to transform a given space into a livable area"
+				"Attempts to transform a given space into a spawn point and NPC living area"
 				+"\nRequires a closed, minimally-sized, unobstructed area"
 				+"\nWarning: This will remove ALL objects within the current area"
 			);

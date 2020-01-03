@@ -61,7 +61,9 @@ namespace PrefabKits.Items {
 					sbyte direction,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
-			if( !TilePlacementHelpers.PlaceObject(leftTileX, floorTileY, tileType, 0, direction) ) {
+			if( tileType == TileID.Containers || tileType == TileID.Containers2 || tileType == TileID.FakeContainers || tileType == TileID.FakeContainers2 ) {
+				WorldGen.PlaceChest( leftTileX + 1, floorTileY, tileType );
+			} else if( !TilePlacementHelpers.PlaceObject(leftTileX, floorTileY, tileType, 0, direction) ) {
 				//if( !TilePlacementHelpers.TryPrecisePlace(leftTileX, floorTileY, tileType, style, direction) ) {
 				if( !WorldGen.PlaceTile(leftTileX, floorTileY, tileType) ) {
 					//throw new ModHelpersException( "Could not place tile "
