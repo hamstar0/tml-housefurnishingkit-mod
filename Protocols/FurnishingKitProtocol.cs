@@ -65,6 +65,8 @@ namespace PrefabKits.Protocols {
 					floorX,
 					floorY
 				);
+			} else {
+				LogHelpers.Alert( "Could not furnish house" );
 			}
 		}
 	}

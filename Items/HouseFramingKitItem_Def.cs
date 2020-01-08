@@ -1,8 +1,10 @@
-﻿using Terraria;
-using Terraria.ModLoader;
-using System;
-using Microsoft.Xna.Framework;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ModLoader;
+using HamstarHelpers.Helpers.Debug;
+using PrefabKits.Protocols;
 
 
 namespace PrefabKits.Items {
@@ -57,7 +59,14 @@ namespace PrefabKits.Items {
 			bool canErect = HouseFramingKitItem.Validate( ref tileX, ref tileY, out _ );
 
 			if( canErect ) {
-				HouseFramingKitItem.MakeHouseFrame( tileX, tileY );
+				if( Main.netMode == 0 ) {
+					HouseFramingKitItem.MakeHouseFrame( tileX, tileY );
+				} else if( Main.netMode == 1 ) {
+					FramingKitProtocol.SendToServer( tileX, tileY );
+					return true;
+				} else if( Main.netMode == 2 ) {
+					LogHelpers.Alert( "Server?" );
+				}
 			} else {
 				Main.NewText( "Not enough open space.", Color.Yellow );
 			}

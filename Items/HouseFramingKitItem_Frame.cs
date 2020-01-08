@@ -83,6 +83,16 @@ Timers.SetTimer( "HFK0_"+x+"_"+y, 2, false, () => {
 				place: placeFeatures
 			);
 
+			if( Main.netMode == 2 ) {
+				NetMessage.SendTileRange(
+					whoAmi: -1,
+					tileX: outerRect.X - 1,
+					tileY: outerRect.Y - 1,
+					xSize: outerRect.Width + 2,
+					ySize: outerRect.Height + 2
+				);
+			}
+
 			//
 
 			HouseFramingKitItem.MakeHouseSupports( outerRect, tileY );
@@ -143,6 +153,23 @@ Timers.SetTimer( "HFK0_"+x+"_"+y, 2, false, () => {
 				hollow: null,
 				place: placeSupportRight
 			);
+
+			if( Main.netMode == 2 ) {
+				NetMessage.SendTileRange(
+					whoAmi: -1,
+					tileX: supportLeft.X,
+					tileY: supportLeft.Y,
+					xSize: supportLeft.Width,
+					ySize: supportLeft.Height
+				);
+				NetMessage.SendTileRange(
+					whoAmi: -1,
+					tileX: supportRight.X,
+					tileY: supportRight.Y,
+					xSize: supportRight.Width,
+					ySize: supportRight.Height
+				);
+			}
 		}
 	}
 }
