@@ -39,16 +39,6 @@ namespace PrefabKits.Items {
 
 			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
 
-			if( Main.netMode == 2 ) {
-				NetMessage.SendTileRange(
-					whoAmi: -1,
-					tileX: outerTopLeft.x,
-					tileY: outerTopLeft.y,
-					xSize: floorRight - floorLeft,
-					ySize: (floorY - outerTopLeft.y) + 1
-				);
-			}
-
 			//
 
 			bool checkPlacement( int x, int y, int width ) {
@@ -106,13 +96,30 @@ namespace PrefabKits.Items {
 				onFinish();
 
 				if( Main.netMode == 2 ) {
-					NetMessage.SendTileRange(
-						whoAmi: -1,
-						tileX: outerTopLeft.x,
-						tileY: outerTopLeft.y,
-						xSize: floorRight - floorLeft,
-						ySize: (floorY - outerTopLeft.y) + 1
-					);
+					int width = outerTopRight.x - outerTopLeft.x;
+					int height = (floorY - outerTopLeft.y) + 2;
+
+					Timers.SetTimer( "PrefabKitsFurnishingKitLeft", 30, false, () => {
+						NetMessage.SendTileRange(
+							whoAmi: -1,
+							tileX: outerTopLeft.x,
+							tileY: outerTopLeft.y,
+							xSize: width / 2,
+							ySize: height
+						);
+						return false;
+					} );
+
+					Timers.SetTimer( "PrefabKitsFurnishingKitRight", 45, false, () => {
+						NetMessage.SendTileRange(
+							whoAmi: -1,
+							tileX: outerTopLeft.x + (width/2),
+							tileY: outerTopLeft.y,
+							xSize: (width - (width/2)) + 1,
+							ySize: height
+						);
+						return false;
+					} );
 				}
 
 				return false;

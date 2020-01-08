@@ -1,10 +1,11 @@
-﻿using Terraria;
-using Terraria.ModLoader;
-using System;
-using HamstarHelpers.Helpers.Tiles.Draw;
-using HamstarHelpers.Classes.Tiles.TilePattern;
-using Terraria.ID;
+﻿using System;
 using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ModLoader;
+using Terraria.ID;
+using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Classes.Tiles.TilePattern;
+using HamstarHelpers.Helpers.Tiles.Draw;
 
 
 namespace PrefabKits.Items {
@@ -82,20 +83,22 @@ Timers.SetTimer( "HFK0_"+x+"_"+y, 2, false, () => {
 				hollow: innerRect,
 				place: placeFeatures
 			);
-
+				
 			if( Main.netMode == 2 ) {
 				NetMessage.SendTileRange(
 					whoAmi: -1,
-					tileX: outerRect.X - 1,
-					tileY: outerRect.Y - 1,
-					xSize: outerRect.Width + 2,
-					ySize: outerRect.Height + 2
+					tileX: outerRect.X,
+					tileY: outerRect.Y ,
+					xSize: outerRect.Width,
+					ySize: outerRect.Height
 				);
 			}
 
 			//
 
-			HouseFramingKitItem.MakeHouseSupports( outerRect, tileY );
+			if( Main.netMode == 0 ) {
+				HouseFramingKitItem.MakeHouseSupports( outerRect, tileY );
+			}
 		}
 
 
