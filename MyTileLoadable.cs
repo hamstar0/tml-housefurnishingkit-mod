@@ -12,12 +12,12 @@ namespace PrefabKits {
 		////////////////
 
 		public void OnModsLoad() {
-			PrefabKitsAPI.OnPreHouseCreate( ( tileX, tileY, item ) => {
+			PrefabKitsAPI.OnPreHouseCreate( ( tileX, tileY ) => {
 				this.IsCreatingHouse = true;
 				return true;
 			} );
 
-			PrefabKitsAPI.OnPostHouseCreate( ( tileX, tileY, item ) => {
+			PrefabKitsAPI.OnPostHouseCreate( ( tileX, tileY ) => {
 				this.IsCreatingHouse = false;
 			} );
 

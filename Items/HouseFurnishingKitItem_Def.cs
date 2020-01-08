@@ -4,12 +4,40 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
+using PrefabKits.Protocols;
 
 
 namespace PrefabKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
 		public static int Width = 36;
 		public static int Height = 28;
+
+
+
+		////////////////
+
+		public static bool FurnishHouseFull(
+					Player player,
+					int tileX,
+					int tileY,
+					IList<(ushort TileX, ushort TileY)> innerHouseSpace,
+					IList<(ushort TileX, ushort TileY)> fullHouseSpace,
+					int floorX,
+					int floorY ) {
+			foreach( Func<int, int, bool> func in PrefabKitsMod.Instance.OnPreHouseCreate ) {
+				if( !func( tileX, tileY ) ) {
+					return false;
+				}
+			}
+
+			HouseFurnishingKitItem.FurnishHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY, () => {
+				foreach( Action<int, int> action in PrefabKitsMod.Instance.OnPostHouseCreate ) {
+					action( tileX, tileY );
+				}
+			} );
+
+			return true;
+		}
 
 
 
@@ -64,19 +92,22 @@ namespace PrefabKits.Items {
 			);
 
 			if( state == HouseViabilityState.Good ) {
-				foreach( Func<int, int, Item, bool> func in PrefabKitsMod.Instance.OnPreHouseCreate ) {
-					if( !func(tileX, tileY, this.item) ) {
-						return false;
-					}
+				if( Main.netMode == 0 ) {
+					return HouseFurnishingKitItem.FurnishHouseFull(
+						player,
+						tileX,
+						tileY,
+						innerHouseSpace,
+						fullHouseSpace,
+						floorX,
+						floorY
+					);
+				} else if( Main.netMode == 1 ) {
+					FurnishingKitProtocol.SendToServer( player, tileX, tileY );
+					return true;
+				} else if( Main.netMode == 2 ) {
+					LogHelpers.Alert( "Server?" );
 				}
-				
-				HouseFurnishingKitItem.MakeHouse( player, innerHouseSpace, fullHouseSpace, floorX, floorY, () => {
-					foreach( Action<int, int, Item> action in PrefabKitsMod.Instance.OnPostHouseCreate ) {
-						action( tileX, tileY, this.item );
-					}
-				} );
-
-				return true;
 			} else {
 				Color color;
 				String msg = HouseFurnishingKitItem.GetViabilityStateMessage( state, fullHouseSpace.Count, innerHouseSpace.Count, out color );

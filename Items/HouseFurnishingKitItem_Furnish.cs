@@ -9,31 +9,45 @@ using HamstarHelpers.Helpers.Debug;
 
 namespace PrefabKits.Items {
 	public partial class HouseFurnishingKitItem : ModItem {
-		public static void MakeHouse(
+		public static void FurnishHouse(
 					Player player,
 					IList<(ushort TileX, ushort TileY)> innerHouseSpace,
 					IList<(ushort TileX, ushort TileY)> fullHouseSpace,
 					int floorX,
 					int floorY,
 					Action onFinish ) {
-			(int x, int y) topLeft, topRight;
+			(int x, int y) innerTopLeft, innerTopRight;
+			(int x, int y) outerTopLeft, outerTopRight;
 			int floorLeft, floorRight;
 			(int x, int y) farTopLeft, farTopRight;
 			IDictionary<int, ISet<int>> occupiedTiles = new Dictionary<int, ISet<int>>();
 
 			HouseFurnishingKitItem.FindHousePoints(
-				innerHouseSpace,
-				floorX,
-				floorY,
-				out topLeft,
-				out topRight,
-				out floorLeft,
-				out floorRight,
-				out farTopLeft,
-				out farTopRight
+				innerHouseSpace: innerHouseSpace,
+				outerHouseSpace: fullHouseSpace,
+				floorX: floorX,
+				floorY: floorY,
+				outerTopLeft: out outerTopLeft,
+				outerTopRight: out outerTopRight,
+				innerTopLeft: out innerTopLeft,
+				innerTopRight: out innerTopRight,
+				floorLeft: out floorLeft,
+				floorRight: out floorRight,
+				farTopLeft: out farTopLeft,
+				farTopRight: out farTopRight
 			);
 
 			HouseFurnishingKitItem.CleanHouse( fullHouseSpace );
+
+			if( Main.netMode == 2 ) {
+				NetMessage.SendTileRange(
+					whoAmi: -1,
+					tileX: outerTopLeft.x,
+					tileY: outerTopLeft.y,
+					xSize: floorRight - floorLeft,
+					ySize: (floorY - outerTopLeft.y) + 1
+				);
+			}
 
 			//
 
@@ -78,8 +92,8 @@ namespace PrefabKits.Items {
 				HouseFurnishingKitItem.MakeHouseTileNear( placeWorkbench,	floorRight - 2,	floorY, fullHouseSpace, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseTileNear( placeChair,		floorRight - 3,	floorY, fullHouseSpace, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseCustomFurnishings(			floorLeft,		floorRight, floorY, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topLeft.x,		topLeft.y, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		topRight.x,		topRight.y, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopLeft.x,		innerTopLeft.y, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopRight.x,		innerTopRight.y, fullHouseSpace, occupiedTiles );
 
 				if( PrefabKitsConfig.Instance.CustomFloorTile > 0 ) {
 					HouseFurnishingKitItem.ChangeFlooring(
@@ -90,6 +104,17 @@ namespace PrefabKits.Items {
 					);
 				}
 				onFinish();
+
+				if( Main.netMode == 2 ) {
+					NetMessage.SendTileRange(
+						whoAmi: -1,
+						tileX: outerTopLeft.x,
+						tileY: outerTopLeft.y,
+						xSize: floorRight - floorLeft,
+						ySize: (floorY - outerTopLeft.y) + 1
+					);
+				}
+
 				return false;
 			} );
 		}
@@ -99,27 +124,59 @@ namespace PrefabKits.Items {
 
 		private static void FindHousePoints(
 					IList<(ushort TileX, ushort TileY)> innerHouseSpace,
+					IList<(ushort TileX, ushort TileY)> outerHouseSpace,
 					int floorX,
 					int floorY,
-					out (int x, int y) topLeft,
-					out (int x, int y) topRight,
+					out (int x, int y) innerTopLeft,
+					out (int x, int y) innerTopRight,
+					out (int x, int y) outerTopLeft,
+					out (int x, int y) outerTopRight,
 					out int floorLeft,
 					out int floorRight,
 					out (int x, int y) farTopLeft,
 					out (int x, int y) farTopRight ) {
-			topLeft = (0, 0);
-			topRight = (0, 0);
+			innerTopLeft = (0, 0);
+			innerTopRight = (0, 0);
+			outerTopLeft = (0, 0);
+			outerTopRight = (0, 0);
 			floorLeft = 0;
 			floorRight = 0;
-			farTopLeft = (floorX - 512, floorY - 512);
-			farTopRight = (floorX + 512, floorY - 512);
+			farTopLeft = ( Math.Max(0, floorX - 512), Math.Max(0, floorY - 512) );
+			farTopRight = ( Math.Min(Main.maxTilesX-1, floorX + 512), Math.Max(0, floorY - 512) );
+
+			foreach( (ushort tileX, ushort tileY) in outerHouseSpace ) {
+				if( outerTopLeft.x == 0 ) {
+					outerTopLeft.x = outerTopRight.x = tileX;
+					outerTopLeft.y = outerTopRight.y = tileY;
+				}
+
+				(int x, int y) oldTopLeft = (outerTopLeft.x - farTopLeft.x, outerTopLeft.y - farTopLeft.y);
+				(int x, int y) newTopLeft = (tileX - farTopLeft.x, tileY - farTopLeft.y);
+
+				int oldTopLeftDistSqr = ( oldTopLeft.x * oldTopLeft.x ) + ( oldTopLeft.y * oldTopLeft.y );
+				int newTopLeftDistSqr = ( newTopLeft.x * newTopLeft.x ) + ( newTopLeft.y * newTopLeft.y );
+				if( newTopLeftDistSqr < oldTopLeftDistSqr ) {
+					outerTopLeft.x = tileX;
+					outerTopLeft.y = tileY;
+				}
+
+				(int x, int y) oldTopRight = (outerTopRight.x - farTopRight.x, outerTopRight.y - farTopRight.y);
+				(int x, int y) newTopRight = (tileX - farTopRight.x, tileY - farTopRight.y);
+
+				int oldTopRightDistSqr = ( oldTopRight.x * oldTopRight.x ) + ( oldTopRight.y * oldTopRight.y );
+				int newTopRightDistSqr = ( newTopRight.x * newTopRight.x ) + ( newTopRight.y * newTopRight.y );
+				if( newTopRightDistSqr < oldTopRightDistSqr ) {
+					outerTopRight.x = tileX;
+					outerTopRight.y = tileY;
+				}
+			}
 
 			foreach( (ushort tileX, ushort tileY) in innerHouseSpace ) {
-				Tile tile = Main.tile[tileX, tileY];
+				Tile tile = Framing.GetTileSafely( tileX, tileY );
 
-				if( topLeft.x == 0 ) {
-					topLeft.x = topRight.x = tileX;
-					topLeft.y = topRight.y = tileY;
+				if( innerTopLeft.x == 0 ) {
+					innerTopLeft.x = innerTopRight.x = tileX;
+					innerTopLeft.y = innerTopRight.y = tileY;
 				}
 
 				//if( tileY == (floorY-2) ) {
@@ -135,24 +192,24 @@ namespace PrefabKits.Items {
 					}
 				}
 
-				(int x, int y) oldTopLeft = (topLeft.x - farTopLeft.x, topLeft.y - farTopLeft.y);
+				(int x, int y) oldTopLeft = (innerTopLeft.x - farTopLeft.x, innerTopLeft.y - farTopLeft.y);
 				(int x, int y) newTopLeft = (tileX - farTopLeft.x, tileY - farTopLeft.y);
 
 				int oldTopLeftDistSqr = ( oldTopLeft.x * oldTopLeft.x ) + ( oldTopLeft.y * oldTopLeft.y );
 				int newTopLeftDistSqr = ( newTopLeft.x * newTopLeft.x ) + ( newTopLeft.y * newTopLeft.y );
 				if( newTopLeftDistSqr < oldTopLeftDistSqr ) {
-					topLeft.x = tileX;
-					topLeft.y = tileY;
+					innerTopLeft.x = tileX;
+					innerTopLeft.y = tileY;
 				}
 
-				(int x, int y) oldTopRight = (topRight.x - farTopRight.x, topRight.y - farTopRight.y);
+				(int x, int y) oldTopRight = (innerTopRight.x - farTopRight.x, innerTopRight.y - farTopRight.y);
 				(int x, int y) newTopRight = (tileX - farTopRight.x, tileY - farTopRight.y);
 
 				int oldTopRightDistSqr = ( oldTopRight.x * oldTopRight.x ) + ( oldTopRight.y * oldTopRight.y );
 				int newTopRightDistSqr = ( newTopRight.x * newTopRight.x ) + ( newTopRight.y * newTopRight.y );
 				if( newTopRightDistSqr < oldTopRightDistSqr ) {
-					topRight.x = tileX;
-					topRight.y = tileY;
+					innerTopRight.x = tileX;
+					innerTopRight.y = tileY;
 				}
 			}
 		}

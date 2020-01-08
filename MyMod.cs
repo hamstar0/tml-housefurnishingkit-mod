@@ -25,8 +25,8 @@ namespace PrefabKits {
 
 		////////////////
 
-		internal IList<Func<int, int, Item, bool>> OnPreHouseCreate = new List<Func<int, int, Item, bool>>();
-		internal IList<Action<int, int, Item>> OnPostHouseCreate = new List<Action<int, int, Item>>();
+		internal IList<Func<int, int, bool>> OnPreHouseCreate = new List<Func<int, int, bool>>();
+		internal IList<Action<int, int>> OnPostHouseCreate = new List<Action<int, int>>();
 
 
 

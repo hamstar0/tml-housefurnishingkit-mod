@@ -2,8 +2,8 @@
 using Terraria;
 using HamstarHelpers.Classes.Errors;
 using HamstarHelpers.Classes.Protocols.Packet.Interfaces;
-using PrefabKits.Items;
 using HamstarHelpers.Helpers.Debug;
+using PrefabKits.Items;
 
 
 namespace PrefabKits.Protocols {
