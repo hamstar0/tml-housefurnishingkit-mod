@@ -1,6 +1,6 @@
 displayName = Prefab Kits
 author = hamstar
 version = 1.0.0.2
-modReferences = HamstarHelpers@5.4.0
+modReferences = HamstarHelpers@5.4.1
 buildIgnore = *.csproj, *.user, *.bat, obj\*, bin\*, .vs\*, .git\*
 homepage = https://github.com/hamstar0/tml-housefurnishingkit-mod

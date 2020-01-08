@@ -4,10 +4,10 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.ObjectData;
-using HamstarHelpers.Helpers.DotNET.Extensions;
-using HamstarHelpers.Helpers.Tiles;
 using HamstarHelpers.Classes.Errors;
 using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Helpers.DotNET.Extensions;
+using HamstarHelpers.Helpers.Tiles;
 
 
 namespace PrefabKits.Items {
@@ -15,11 +15,33 @@ namespace PrefabKits.Items {
 		private static void CleanHouse( IList<(ushort TileX, ushort TileY)> fullHouseSpace ) {	// Careful!
 			foreach( (ushort tileX, ushort tileY) in fullHouseSpace ) {
 				Tile tile = Main.tile[ tileX, tileY ];
+				if( !HouseFurnishingKitItem.IsCleanableTile(tile) ) {
+					continue;
+				}
 
-				if( HouseFurnishingKitItem.IsCleanableTile(tile) ) {
-					tile.active( false );
-					tile.type = 0;
-					//WorldGen.KillTile( tileX, tileY, false, false, true );
+				tile.active( false );
+				tile.type = 0;
+				//WorldGen.KillTile( tileX, tileY, false, false, true );
+
+				if( tile.type == TileID.Containers || tile.type == TileID.Containers2 ) {
+					if( Main.netMode == 2 ) {
+						int? chestTypeRaw = HamstarHelpers.Helpers.Tiles.Attributes.TileAttributeHelpers.GetChestTypeCode( tile.type );
+						int? chestType = chestTypeRaw.HasValue ? chestTypeRaw.Value : 0;
+
+						NetMessage.SendData(
+							msgType: MessageID.ChestUpdates,
+							remoteClient: -1,
+							ignoreClient: -1,
+							text: null,
+							number: chestType.Value,
+							number2: (float)tileX,
+							number3: (float)tileY,
+							number4: 0f,
+							number5: Chest.FindChest( tileX, tileY ),
+							number6: tile.type,
+							number7: 0
+						);
+					}
 				}
 			}
 		}
@@ -62,7 +84,29 @@ namespace PrefabKits.Items {
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
 			if( tileType == TileID.Containers || tileType == TileID.Containers2 || tileType == TileID.FakeContainers || tileType == TileID.FakeContainers2 ) {
-				WorldGen.PlaceChest( leftTileX + 1, floorTileY, tileType );
+				int chestIdx = WorldGen.PlaceChest( leftTileX + 1, floorTileY, tileType );
+				if( chestIdx == -1 ) {
+					return false;
+				}
+
+				if( Main.netMode == 2 ) {
+					int? chestTypeRaw = HamstarHelpers.Helpers.Tiles.Attributes.TileAttributeHelpers.GetChestTypeCode( tileType );
+					int? chestType = chestTypeRaw.HasValue ? chestTypeRaw.Value : 0;
+
+					NetMessage.SendData(
+						msgType: MessageID.ChestUpdates,
+						remoteClient: -1,
+						ignoreClient: -1,
+						text: null,
+						number: chestType.Value,
+						number2: (float)leftTileX,
+						number3: (float)floorTileY,
+						number4: 0f,
+						number5: chestIdx,
+						number6: tileType,
+						number7: 0
+					);
+				}
 			} else if( !TilePlacementHelpers.PlaceObject(leftTileX, floorTileY, tileType, 0, direction) ) {
 				//if( !TilePlacementHelpers.TryPrecisePlace(leftTileX, floorTileY, tileType, style, direction) ) {
 				if( !WorldGen.PlaceTile(leftTileX, floorTileY, tileType) ) {
