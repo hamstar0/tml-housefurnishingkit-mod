@@ -66,8 +66,8 @@ namespace PrefabKits {
 
 
 		[Range( 16, 1024 )]
-		[DefaultValue( 80 )]
-		public int MinimumFurnishableHouseArea { get; set; } = 80;
+		[DefaultValue( 78 )]
+		public int MinimumFurnishableHouseArea { get; set; } = 78;
 
 		[Range( 4, 128 )]
 		[DefaultValue( 12 )]

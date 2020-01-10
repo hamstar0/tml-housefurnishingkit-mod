@@ -164,7 +164,7 @@ namespace PrefabKits.Items {
 				pattern: formPattern,
 				tileX: tileX,
 				tileY: tileY,
-				minimumVolume: PrefabKitsConfig.Instance.MinimumFurnishableHouseArea,	//80
+				minimumVolume: PrefabKitsConfig.Instance.MinimumFurnishableHouseArea,	//78
 				minimumFloorWidth: PrefabKitsConfig.Instance.MinimumFurnishableHouseFloorWidth,//12
 				houseSpace: out fullHouseSpace,
 				floorX: out floorX,
