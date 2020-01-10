@@ -12,11 +12,15 @@ namespace PrefabKits.Recipes {
 				this.AddTile( PrefabKitsConfig.Instance.TrackDeploymentKitRecipeTile );
 			}
 			
+			//
+
 			this.AddIngredient( ItemID.MinecartTrack, PrefabKitsConfig.Instance.TrackDeploymentKitTracks );
 
 			foreach( ItemDefinition itemDef in PrefabKitsConfig.Instance.TrackDeploymentKitRecipeExtraIngredient ) {
 				this.AddIngredient( itemDef.Type );
 			}
+
+			//
 
 			this.SetResult( ModContent.ItemType<TrackDeploymentKitItem>() );
 		}

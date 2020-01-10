@@ -169,7 +169,7 @@ namespace PrefabKits {
 
 			PlayerItemHelpers.RemoveInventoryItemQuantity( this.player, heldTrackKitItemType, 1 );
 
-			int leftovers = TrackDeploymentKitItem.Redeploy();
+			int leftovers = TrackDeploymentKitItem.Redeploy( this.player.whoAmI );
 			if( leftovers == 0 ) {
 				return;
 			}
@@ -179,7 +179,7 @@ namespace PrefabKits {
 			if( Main.netMode != 1 ) {
 				NetMessage.SendData( MessageID.SyncItem, -1, -1, null, itemWho, 1f );
 			} else {
-				TrackDeploymentProtocol.BroadcastFromClient( resume.dir > 0, resume.x, resume.y, true );
+				TrackKitDeployProtocol.SendToServer( resume.dir > 0, resume.x, resume.y, true );
 			}
 		}
 	}

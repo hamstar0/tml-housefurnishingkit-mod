@@ -7,11 +7,35 @@ using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
 using HamstarHelpers.Services.Timers;
 using HamstarHelpers.Helpers.Fx;
+using PrefabKits.Protocols;
 
 
 namespace PrefabKits.Items {
 	public partial class TrackDeploymentKitItem : ModItem {
-		public static int Deploy( bool isAimedRight, int tileX, int tileY ) {
+		public static void PlaceTrack( int x, int y ) {
+			WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
+			WorldGen.SquareTileFrame( x, y );
+
+			var pos = new Vector2( x << 4, y << 4 );
+
+			Main.PlaySound( SoundID.Item52, pos );
+			ParticleFxHelpers.MakeDustCloud( pos, 1 );
+		}
+
+		public static bool PlaceResumePoint( int x, int y, bool dir ) {
+			if( Main.tile[x, y]?.active() == true ) {
+				return false;
+			}
+
+			var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
+			kitSingleton.ResumeDeploymentAt = (x, y, dir ? 1 : -1);
+			return true;
+		}
+
+
+		////////////////
+
+		public static int Deploy( int fromPlayerWho, int tileX, int tileY, bool isAimedRight ) {
 			int tracks = PrefabKitsConfig.Instance.TrackDeploymentKitTracks;
 			int tracksScanRange = tracks + ( tracks / 2 );
 
@@ -20,42 +44,45 @@ namespace PrefabKits.Items {
 			IList<(int, int)> path = TrackDeploymentKitItem.TracePath( tileX, tileY, dir, tracksScanRange );
 
 			if( path.Count > 0 ) {
-				TrackDeploymentKitItem.DeployRunner( path, tracks, 0, ( x, y ) => {
-					if( Main.tile[x, y]?.active() == true ) { return; }
-
-					var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
-					kitSingleton.ResumeDeploymentAt = (x, y, dir);
-				} );
+				TrackDeploymentKitItem.DeployRunner( fromPlayerWho, path, isAimedRight, tracks, 0 );
 			}
 
 			return Math.Max( tracks - path.Count, 0 );
 		}
 
-		public static int ForceRedeploy( bool isAimedRight, int tileX, int tileY ) {
-			var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
-			kitSingleton.ResumeDeploymentAt = (0, 0, 0);
-
-			return TrackDeploymentKitItem.Deploy( isAimedRight, tileX, tileY );
-		}
-
-		public static int Redeploy() {
+		public static int Redeploy( int fromPlayerWho ) {
 			var kitSingleton = ModContent.GetInstance<TrackDeploymentKitItem>();
 			(int x, int y, int dir) resume = kitSingleton.ResumeDeploymentAt;
+
+			kitSingleton.ResumeDeploymentAt = (0, 0, 0);
+
+			if( Main.tile[resume.x, resume.y]?.active() == true ) {
+				Main.NewText( "Track kit auto-deploy obstructed.", Color.Yellow );
+				return 0;
+			}
 /*int blah=120;
 Timers.SetTimer( "blah_"+resume.x+"_"+resume.y, 3, false, () => {
 	Dust.QuickDust( new Point(resume.x,resume.y), Color.Red );
 	return blah-- > 0;
 } );*/
 
-			kitSingleton.ResumeDeploymentAt = (0, 0, 0);
-
-			return TrackDeploymentKitItem.Deploy( resume.dir > 0, resume.x, resume.y );
+			if( Main.netMode == 0 ) {
+				return TrackDeploymentKitItem.Deploy( fromPlayerWho, resume.x, resume.y, resume.dir > 0 );
+			} else {
+				TrackKitDeployProtocol.SendToServer( resume.dir > 0, resume.x, resume.y, true );
+				return 0;
+			}
 		}
 
 
 		////
 
-		public static void DeployRunner( IList<(int x, int y)> path, int trackMax, int trackNum, Action<int, int> onLastTrack ) {
+		public static void DeployRunner(
+					int fromPlayerWho,
+					IList<(int x, int y)> path,
+					bool isAimedRight,
+					int trackMax,
+					int trackNum ) {
 			int x = path[trackNum].x;
 			int y = path[trackNum].y;
 			/*int blah=120;
@@ -70,34 +97,40 @@ Timers.SetTimer( "blah_"+resume.x+"_"+resume.y, 3, false, () => {
 				}
 			}
 
+			int lastTrackIdx = trackMax < path.Count
+				? trackMax - 1
+				: path.Count - 1;
+			bool isLastTrack = trackNum >= ( lastTrackIdx - 1 );
+			bool isNotAborted = trackMax < path.Count;	// if path cuts this short, do not run event
+
 			if( Main.tile[x, y]?.type != TileID.MinecartTrack ) {
-				WorldGen.PlaceTile( x, y, TileID.MinecartTrack );
-				WorldGen.SquareTileFrame( x, y );
+				TrackDeploymentKitItem.PlaceTrack( x, y );
 
-				var pos = new Vector2( x << 4, y << 4 );
+				if( Main.netMode == 2 ) {
+					//NetMessage.SendTileSquare( -1, x, y, 1 );
+					TrackKitTileProtocol.SendToClients( x, y );
+				}
 
-				Main.PlaySound( SoundID.Item52, pos );
-				ParticleFxHelpers.MakeDustCloud( pos, 1 );
+				if( isLastTrack && isNotAborted ) {
+					(int x, int y) lastPathNode = path[trackNum + 1];
+
+					if( Main.netMode == 0 ) {
+						TrackDeploymentKitItem.PlaceResumePoint( lastPathNode.x, lastPathNode.y, isAimedRight );
+					} else if( Main.netMode == 2 ) {
+						TrackKitResumeProtocol.SendToClient( fromPlayerWho, lastPathNode.x, lastPathNode.y, isAimedRight );
+					}
+				}
 
 				if( trackNum % 8 == 0 ) {
 					TrackDeploymentKitItem.CreateSupportPillar( x, y );
 				}
 			}
 
-			int lastTrackIdx = trackMax < path.Count
-				? trackMax - 1
-				: path.Count - 1;
-
-			if( trackNum < ( lastTrackIdx - 1 ) ) {
+			if( !isLastTrack ) {
 				Timers.SetTimer( "PrefabKitsTrackDeploy_" + path.GetHashCode(), 7, false, () => {
-					TrackDeploymentKitItem.DeployRunner( path, trackMax, trackNum + 1, onLastTrack );
+					TrackDeploymentKitItem.DeployRunner( fromPlayerWho, path, isAimedRight, trackMax, trackNum + 1 );
 					return false;
 				} );
-			} else {
-				if( trackMax < path.Count ) {   // if path cuts this short, do not run event
-					(int x, int y) lastPathNode = path[trackNum + 1];
-					onLastTrack( lastPathNode.x, lastPathNode.y );
-				}
 			}
 		}
 
@@ -132,6 +165,10 @@ Timers.SetTimer( "blah_"+resume.x+"_"+resume.y, 3, false, () => {
 				if( Main.tile[tileX, y]?.wall == 0 ) {
 					WorldGen.PlaceWall( tileX, y, WallID.RichMahoganyFence );
 				}
+
+				if( Main.netMode != 0 ) {
+					NetMessage.SendTileSquare( -1, tileX, y, 1 );
+				}
 			}
 		}
 
@@ -144,7 +181,7 @@ Timers.SetTimer( "blah_"+resume.x+"_"+resume.y, 3, false, () => {
 				itemWho = Item.NewItem( new Vector2((tileX<<4) + 8, (tileY<<4) + 8), ItemID.MinecartTrack, leftovers );
 			}
 
-			if( Main.netMode == 1 ) {
+			if( Main.netMode != 0 ) {
 				if( itemWho != -1 ) {
 					NetMessage.SendData( MessageID.SyncItem, -1, -1, null, itemWho, 1f );
 				}

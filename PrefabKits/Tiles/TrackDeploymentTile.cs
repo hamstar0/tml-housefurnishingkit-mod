@@ -9,6 +9,21 @@ using PrefabKits.Protocols;
 
 namespace PrefabKits.Tiles {
 	public class TrackDeploymentTile : ModTile {
+		public static void DeployAt( int i, int j, bool isFacingRight, int fromPlayerWho ) {
+			Main.tile[i, j].ClearTile();
+
+			if( Main.netMode == 2 ) {
+				NetMessage.SendTileSquare( -1, i, j, 1 );
+			}
+
+			int leftovers = TrackDeploymentKitItem.Deploy( fromPlayerWho, i, j, isFacingRight );
+			TrackDeploymentKitItem.DropLeftovers( leftovers, i, j );
+		}
+
+
+
+		////////////////
+
 		public override void SetDefaults() {
 			//var flags = AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile | AnchorType.SolidWithTop;
 
@@ -112,13 +127,10 @@ namespace PrefabKits.Tiles {
 		public override void PlaceInWorld( int i, int j, Item item ) {
 			bool isFacingRight = Main.LocalPlayer.direction == 1;
 
-			Main.tile[i, j].ClearTile();
-
-			int leftovers = TrackDeploymentKitItem.Deploy( isFacingRight, i, j );
-			TrackDeploymentKitItem.DropLeftovers( leftovers, i, j );
-
 			if( Main.netMode == 1 ) {
-				TrackDeploymentProtocol.BroadcastFromClient( isFacingRight, i, j, false );
+				TrackKitDeployProtocol.SendToServer( isFacingRight, i, j, false );
+			} else if( Main.netMode == 0 ) {
+				TrackDeploymentTile.DeployAt( i, j, isFacingRight, Main.myPlayer );
 			}
 		}
 	}

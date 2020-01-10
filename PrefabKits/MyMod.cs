@@ -3,6 +3,7 @@ using HamstarHelpers.Services.AnimatedColor;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PrefabKits.Items;
+using PrefabKits.Recipes;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,14 @@ namespace PrefabKits {
 
 		public override void Unload() {
 			PrefabKitsMod.Instance = null;
+		}
+
+
+		////////////////
+
+		public override void AddRecipes() {
+			var trackKitRecipe = new TrackDeploymentKitRecipe();
+			trackKitRecipe.AddRecipe();
 		}
 
 
