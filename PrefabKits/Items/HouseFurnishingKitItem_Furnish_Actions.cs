@@ -107,13 +107,16 @@ namespace PrefabKits.Items {
 						number7: 0
 					);
 				}
-			} else if( !TilePlacementHelpers.PlaceObject(leftTileX, floorTileY, tileType, 0, direction) ) {
-				//if( !TilePlacementHelpers.TryPrecisePlace(leftTileX, floorTileY, tileType, style, direction) ) {
-				if( !WorldGen.PlaceTile(leftTileX, floorTileY, tileType) ) {
-					//throw new ModHelpersException( "Could not place tile "
-					//	+ (tileType >= Main.tileTexture.Length ? ""+tileType : TileID.Search.GetName(tileType))
-					//);
-					return false;
+			} else {
+				if( !TilePlacementHelpers.PlaceObject( leftTileX, floorTileY, tileType, 0, direction ) ) {
+					//if( !TilePlacementHelpers.TryPrecisePlace(leftTileX, floorTileY, tileType, style, direction) ) {
+					if( !WorldGen.PlaceTile( leftTileX, floorTileY, tileType ) ) {
+						//throw new ModHelpersException( "Could not place tile "
+						//	+ (tileType >= Main.tileTexture.Length ? ""+tileType : TileID.Search.GetName(tileType))
+						//);
+						return false;
+					}
+					WorldGen.SquareTileFrame( leftTileX, floorTileY );
 				}
 			}
 
@@ -366,6 +369,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 		public static void ChangeFlooring( ushort tileType, int leftX, int rightX, int floorY ) {
 			for( int i=leftX-1; i<rightX+2; i++ ) {
 				Main.tile[ i, floorY + 1 ].type = tileType;
+				WorldGen.SquareTileFrame( i, floorY + 1 );
 			}
 		}
 	}
