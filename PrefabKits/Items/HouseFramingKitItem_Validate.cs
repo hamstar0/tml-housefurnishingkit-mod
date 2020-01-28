@@ -27,7 +27,7 @@ namespace PrefabKits.Items {
 			int availableArea = 0;
 
 			TileDrawPrimitivesHelpers.DrawRectangle(
-				filter: TilePattern.AbsoluteAir,
+				filter: TilePattern.NonActive,
 				area: outerRect,
 				hollow: null,//innerRect,
 				place: ( x, y ) => {

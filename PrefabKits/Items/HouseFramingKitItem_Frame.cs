@@ -72,13 +72,13 @@ Timers.SetTimer( "HFK0_"+x+"_"+y, 2, false, () => {
 			//
 
 			TileDrawPrimitivesHelpers.DrawRectangle(
-				filter: TilePattern.AbsoluteAir,
+				filter: TilePattern.NonActive,
 				area: outerRect,
 				hollow: innerRect,
 				place: placeSolidFrame
 			);
 			TileDrawPrimitivesHelpers.DrawRectangle(
-				filter: TilePattern.AbsoluteAir,
+				filter: TilePattern.NonActive,
 				area: outerRect,
 				hollow: innerRect,
 				place: placeFeatures
