@@ -76,6 +76,8 @@ namespace PrefabKits.Items {
 
 			//
 
+			var config = PrefabKitsConfig.Instance;
+
 			Timers.SetTimer( "HouseKitsFurnishingDelay", 1, false, () => {
 				HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
 				HouseFurnishingKitItem.MakeHouseTileNear( placeBed,			floorLeft,		floorY, fullHouseSpace, occupiedTiles );
@@ -85,9 +87,9 @@ namespace PrefabKits.Items {
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopLeft.x,		innerTopLeft.y, fullHouseSpace, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopRight.x,		innerTopRight.y, fullHouseSpace, occupiedTiles );
 
-				if( PrefabKitsConfig.Instance.CustomFloorTile > 0 ) {
+				if( config.Get<ushort>( nameof(PrefabKitsConfig.CustomFloorTile) ) > 0 ) {
 					HouseFurnishingKitItem.ChangeFlooring(
-						PrefabKitsConfig.Instance.CustomFloorTile,
+						config.Get<ushort>( nameof(PrefabKitsConfig.CustomFloorTile) ),
 						floorLeft,
 						floorRight,
 						floorY

@@ -3,13 +3,13 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
-using HamstarHelpers.Services.Configs;
 
 
 namespace PrefabKits {
-	public class PrefabKitsConfig : StackableModConfig {
-		public static PrefabKitsConfig Instance => ModConfigStack.GetMergedConfigs<PrefabKitsConfig>();
+	public partial class PrefabKitsConfig : ModConfig {
+		public static PrefabKitsConfig Instance => ModContent.GetInstance<PrefabKitsConfig>();
 
 
 

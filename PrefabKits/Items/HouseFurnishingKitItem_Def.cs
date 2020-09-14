@@ -61,7 +61,7 @@ namespace PrefabKits.Items {
 			this.item.useAnimation = 30;
 			//this.item.UseSound = SoundID.Item108;
 			this.item.maxStack = 1;
-			this.item.value = PrefabKitsConfig.Instance.HouseFurnishingKitPrice;
+			this.item.value = PrefabKitsConfig.Instance.Get<int>( nameof(PrefabKitsConfig.HouseFurnishingKitPrice) );
 			this.item.rare = 2;
 		}
 

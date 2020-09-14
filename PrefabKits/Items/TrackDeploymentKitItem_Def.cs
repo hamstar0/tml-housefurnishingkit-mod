@@ -20,9 +20,11 @@ namespace PrefabKits.Items {
 		////////////////
 
 		public override void SetStaticDefaults() {
+			int tracks = PrefabKitsConfig.Instance.Get<int>( nameof(PrefabKitsConfig.TrackDeploymentKitTracks) );
+
 			this.DisplayName.SetDefault( "Track Deployment Kit" );
 			this.Tooltip.SetDefault( "Unfurls a spool of train tracks in the direction you're facing"
-				+ "\nPlaces " + PrefabKitsConfig.Instance.TrackDeploymentKitTracks + " tracks in a row"
+				+ "\nPlaces " + tracks + " tracks in a row"
 				+ "\nAlways places the row as close to the ground as it can while also clearing oncoming obstacles"
 				+ "\nKits in your hands will auto-deploy when you ride to the end of the unfurled row" );
 		}

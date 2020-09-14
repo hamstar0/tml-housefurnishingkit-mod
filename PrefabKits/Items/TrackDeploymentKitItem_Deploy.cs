@@ -36,7 +36,7 @@ namespace PrefabKits.Items {
 		////////////////
 
 		public static int Deploy( int fromPlayerWho, int tileX, int tileY, bool isAimedRight ) {
-			int tracks = PrefabKitsConfig.Instance.TrackDeploymentKitTracks;
+			int tracks = PrefabKitsConfig.Instance.Get<int>( nameof(PrefabKitsConfig.TrackDeploymentKitTracks) );
 			int tracksScanRange = tracks + ( tracks / 2 );
 
 			int dir = isAimedRight ? 1 : -1;

@@ -170,7 +170,9 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 					int floorTileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
-			ushort custFurnType = PrefabKitsConfig.Instance.CustomFurnitureTile;
+			var config = PrefabKitsConfig.Instance;
+
+			ushort custFurnType = config.Get<ushort>( nameof(PrefabKitsConfig.CustomFurnitureTile) );
 			if( custFurnType > 0 ) {
 				HouseFurnishingKitItem.MakeHouseCustomMainFurniture(
 					custFurnType,
@@ -181,7 +183,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 				);
 			}
 
-			ushort custWallMount1 = PrefabKitsConfig.Instance.CustomWallMount1Tile;
+			ushort custWallMount1 = config.Get<ushort>( nameof(PrefabKitsConfig.CustomWallMount1Tile) );
 			if( custWallMount1 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
@@ -195,7 +197,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 				);
 			}
 
-			ushort custWallMount2 = PrefabKitsConfig.Instance.CustomWallMount2Tile;
+			ushort custWallMount2 = config.Get<ushort>( nameof(PrefabKitsConfig.CustomWallMount2Tile) );
 			if( custWallMount2 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {

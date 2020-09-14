@@ -1,5 +1,6 @@
 ﻿using PrefabKits.Items;
 using System;
+using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
@@ -8,15 +9,20 @@ using Terraria.ModLoader.Config;
 namespace PrefabKits.Recipes {
 	class TrackDeploymentKitRecipe : ModRecipe {
 		public TrackDeploymentKitRecipe() : base( PrefabKitsMod.Instance ) {
-			if( PrefabKitsConfig.Instance.TrackDeploymentKitRecipeTile >= 0 ) {
-				this.AddTile( PrefabKitsConfig.Instance.TrackDeploymentKitRecipeTile );
+			var config = PrefabKitsConfig.Instance;
+
+			if( config.Get<int>( nameof(PrefabKitsConfig.TrackDeploymentKitRecipeTile) ) >= 0 ) {
+				this.AddTile( config.Get<int>( nameof(PrefabKitsConfig.TrackDeploymentKitRecipeTile) ) );
 			}
 			
 			//
+			
+			int tracks = config.Get<int>( nameof(PrefabKitsConfig.TrackDeploymentKitTracks) );
+			this.AddIngredient( ItemID.MinecartTrack, tracks );
 
-			this.AddIngredient( ItemID.MinecartTrack, PrefabKitsConfig.Instance.TrackDeploymentKitTracks );
-
-			foreach( ItemDefinition itemDef in PrefabKitsConfig.Instance.TrackDeploymentKitRecipeExtraIngredient ) {
+			string ingredConfigEntry = nameof( PrefabKitsConfig.TrackDeploymentKitRecipeExtraIngredient );
+			var ingredItems = config.Get<List<ItemDefinition>>( ingredConfigEntry );
+			foreach( ItemDefinition itemDef in ingredItems ) {
 				this.AddIngredient( itemDef.Type );
 			}
 
@@ -27,7 +33,7 @@ namespace PrefabKits.Recipes {
 
 
 		public override bool RecipeAvailable() {
-			return PrefabKitsConfig.Instance.TrackDeploymentKitEnabled;
+			return PrefabKitsConfig.Instance.Get<bool>( nameof(PrefabKitsConfig.TrackDeploymentKitEnabled) );
 		}
 	}
 }
