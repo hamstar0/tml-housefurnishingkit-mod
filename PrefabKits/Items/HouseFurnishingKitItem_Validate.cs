@@ -28,7 +28,7 @@ namespace PrefabKits.Items {
 					int fullSpace,
 					int innerSpace,
 					out Color color ) {
-			ushort minFurnishArea;
+			int minFurnishArea;
 			var config = PrefabKitsConfig.Instance;
 
 			switch( state ) {
@@ -36,11 +36,11 @@ namespace PrefabKits.Items {
 				color = Color.Lime;
 				return "Valid town house space found. Note: Only above ground houses are automatically occupied.";
 			case HouseViabilityState.TooSmall:
-				minFurnishArea = config.Get<ushort>( nameof(PrefabKitsConfig.MinimumFurnishableHouseArea) );
+				minFurnishArea = config.Get<int>( nameof(config.MinimumFurnishableHouseArea) );
 				color = Color.Yellow;
 				return "House too small ("+fullSpace+" of "+minFurnishArea+" blocks needed).";
 			case HouseViabilityState.TooSmallInner:
-				minFurnishArea = config.Get<ushort>( nameof( PrefabKitsConfig.MinimumFurnishableHouseArea ) );
+				minFurnishArea = config.Get<int>( nameof(config.MinimumFurnishableHouseArea) );
 				color = Color.Yellow;
 				return "House too small inside ("+innerSpace+" of "+(minFurnishArea/2)+" blocks needed).";
 			case HouseViabilityState.TooLarge:
