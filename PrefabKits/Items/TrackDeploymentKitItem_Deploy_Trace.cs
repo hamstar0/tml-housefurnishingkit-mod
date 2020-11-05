@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using HamstarHelpers.Helpers.Debug;
 using HamstarHelpers.Classes.Tiles.TilePattern;
-using Microsoft.Xna.Framework;
+using HamstarHelpers.Helpers.Debug;
 
 
 namespace PrefabKits.Items {
@@ -31,12 +31,13 @@ namespace PrefabKits.Items {
 				return new List<(int, int)>();
 			}
 
-			IList<(int, int)> path = new List<(int, int)> { (tileX, tileY) };
 			IDictionary<(int, int), PathTree> pathMap = new Dictionary<(int, int), PathTree>();
-
 			PathTree pathTree = TrackDeploymentKitItem.TracePathTree( tileX, tileY, dir, 0, tracks, pathMap );
 
+			IList<(int, int)> path = new List<(int, int)> { (tileX, tileY) };
 			TrackDeploymentKitItem.TraceTreeForLongestPath( pathTree, path );
+
+			TrackDeploymentKitItem.SmoothPath( path );
 
 			return path;
 		}
@@ -59,6 +60,8 @@ namespace PrefabKits.Items {
 				tree.HighestDepthCount = 0;
 				return tree;
 			}
+
+			//
 
 			PathTree createTree( int x, int y, int oldVerticalDir, int newVerticalDir ) {
 				var mytree = new PathTree {
@@ -90,6 +93,8 @@ namespace PrefabKits.Items {
 
 				return mytree;
 			}
+
+			//
 
 			tree.Bot = createTree( tileX + horizontalDir,	tileY + 1,	verticalDir,	1 );
 			tree.Mid = createTree( tileX + horizontalDir,	tileY,		verticalDir,	0 );
@@ -132,29 +137,6 @@ namespace PrefabKits.Items {
 			} else {
 				path.Add( (pathTree.Top.TileX, pathTree.Top.TileY) );
 				TrackDeploymentKitItem.TraceTreeForLongestPath( pathTree.Top, path );
-			}
-		}
-
-
-
-
-		public class PathTree {
-			public int TileX;
-			public int TileY;
-			public int HighestDepthCount;
-
-			public PathTree Top;
-			public PathTree Mid;
-			public PathTree Bot;
-
-
-			public int Count() {
-				int count = this.HighestDepthCount > 0 ? 1 : 0;
-				count += this.Top?.Count() ?? 0;
-				count += this.Mid?.Count() ?? 0;
-				count += this.Bot?.Count() ?? 0;
-
-				return count;
 			}
 		}
 	}

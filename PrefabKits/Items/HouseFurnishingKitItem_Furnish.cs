@@ -87,9 +87,9 @@ namespace PrefabKits.Items {
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopLeft.x,		innerTopLeft.y, fullHouseSpace, occupiedTiles );
 				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopRight.x,		innerTopRight.y, fullHouseSpace, occupiedTiles );
 
-				if( config.Get<ushort>( nameof(PrefabKitsConfig.CustomFloorTile) ) > 0 ) {
+				if( config.Get<ushort>( nameof(config.CustomFloorTile) ) > 0 ) {
 					HouseFurnishingKitItem.ChangeFlooring(
-						config.Get<ushort>( nameof(PrefabKitsConfig.CustomFloorTile) ),
+						config.Get<ushort>( nameof(config.CustomFloorTile) ),
 						floorLeft,
 						floorRight,
 						floorY

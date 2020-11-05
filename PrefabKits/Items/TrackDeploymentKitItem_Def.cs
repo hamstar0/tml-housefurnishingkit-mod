@@ -30,6 +30,8 @@ namespace PrefabKits.Items {
 		}
 
 		public override void SetDefaults() {
+			int tracks = PrefabKitsConfig.Instance.Get<int>( nameof(PrefabKitsConfig.TrackDeploymentKitTracks) );
+
 			this.item.width = TrackDeploymentKitItem.ItemWidth;
 			this.item.height = TrackDeploymentKitItem.ItemHeight;
 			this.item.maxStack = 99;
@@ -41,7 +43,7 @@ namespace PrefabKits.Items {
 			this.item.consumable = true;
 			this.item.createTile = ModContent.TileType<TrackDeploymentTile>();
 			this.item.placeStyle = 0;
-			this.item.value = PrefabKitsConfig.Instance.TrackDeploymentKitTracks * 100;
+			this.item.value = tracks * 100;
 			//this.item.UseSound = SoundID.Item108;
 			this.item.rare = 2;
 		}

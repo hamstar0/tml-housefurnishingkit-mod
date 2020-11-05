@@ -110,7 +110,12 @@ namespace PrefabKits.Items {
 				}
 			} else {
 				Color color;
-				String msg = HouseFurnishingKitItem.GetViabilityStateMessage( state, fullHouseSpace.Count, innerHouseSpace.Count, out color );
+				String msg = HouseFurnishingKitItem.GetViabilityStateMessage(
+					state,
+					fullHouseSpace.Count,
+					innerHouseSpace.Count,
+					out color
+				);
 
 				Main.NewText( msg, color );
 			}

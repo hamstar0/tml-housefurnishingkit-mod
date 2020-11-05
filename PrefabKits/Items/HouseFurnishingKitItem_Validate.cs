@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
@@ -117,7 +117,14 @@ namespace PrefabKits.Items {
 			IList<(ushort TileX, ushort TileY)> fullHouseSpace;
 			int floorX, floorY;
 
-			return HouseFurnishingKitItem.IsValidHouse( tileX, tileY, out innerHouseSpace, out fullHouseSpace, out floorX, out floorY );
+			return HouseFurnishingKitItem.IsValidHouse(
+				tileX,
+				tileY,
+				out innerHouseSpace,
+				out fullHouseSpace,
+				out floorX,
+				out floorY
+			);
 		}
 
 
@@ -143,11 +150,11 @@ namespace PrefabKits.Items {
 					return false;
 				}
 				return !Main.tileSolid[tile.type]
-					|| (Main.tileSolid[tile.type] && Main.tileSolidTop[tile.type] && tile.slope() != 0)  //stair
+					|| (Main.tileSolidTop[tile.type] && tile.slope() != 0)  //stair
 					|| HouseFurnishingKitItem.IsCleanableTile( tile );
 			}
 
-			///
+			//
 
 			TilePattern formPattern = new TilePattern( new TilePatternBuilder {
 				CustomCheck = isStairOrNotSolid
@@ -164,14 +171,15 @@ namespace PrefabKits.Items {
 			//
 
 			var config = PrefabKitsConfig.Instance;
-			HouseViabilityState state;
+			int minVolume = config.Get<int>( nameof(config.MinimumFurnishableHouseArea) );	//78
+			int minFloorWid = config.Get<int>( nameof(config.MinimumFurnishableHouseFloorWidth) );    //12
 
-			state = HouseFurnishingKitItem.IsValidHouseByCriteria(
+			HouseViabilityState state = HouseFurnishingKitItem.IsValidHouseByCriteria(
 				pattern: formPattern,
 				tileX: tileX,
 				tileY: tileY,
-				minimumVolume: config.Get<int>( nameof(PrefabKitsConfig.MinimumFurnishableHouseArea) ),	//78
-				minimumFloorWidth: config.Get<int>( nameof(PrefabKitsConfig.MinimumFurnishableHouseFloorWidth) ),//12
+				minimumVolume: minVolume,
+				minimumFloorWidth: minFloorWid,
 				houseSpace: out fullHouseSpace,
 				floorX: out floorX,
 				floorY: out floorY
@@ -193,8 +201,8 @@ namespace PrefabKits.Items {
 				pattern: fillPattern,
 				tileX: floorX,
 				tileY: tileY,
-				minimumVolume: 40,
-				minimumFloorWidth: 12,
+				minimumVolume: minVolume / 2,
+				minimumFloorWidth: minFloorWid - 1,
 				houseSpace: out innerHouseSpace,
 				floorX: out floorX,
 				floorY: out altFloorY
