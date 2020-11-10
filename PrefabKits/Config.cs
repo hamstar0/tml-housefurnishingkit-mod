@@ -47,8 +47,10 @@ namespace PrefabKits {
 		public int TrackDeploymentKitRecipeTile { get; set; } = TileID.WorkBenches;
 
 		[ReloadRequired]
-		public List<ItemDefinition> TrackDeploymentKitRecipeExtraIngredient { get; set; } = new List<ItemDefinition> {
-			new ItemDefinition( ItemID.GrapplingHook )
+		public Dictionary<ItemDefinition, int> TrackDeploymentKitRecipeExtraIngredient { get; set; } = new Dictionary<ItemDefinition, int> {
+			{ new ItemDefinition(ItemID.GrapplingHook), 1 },
+			{ new ItemDefinition(ItemID.Minecart), 1 },
+			{ new ItemDefinition(ItemID.WoodenBeam), 100 }
 		};
 
 
