@@ -64,7 +64,7 @@ namespace PrefabKits.Items {
 
 			switch( tile.type ) {
 			case TileID.Platforms:
-				return tile.slope() != 0;
+				return tile.slope() != 0;	// stairs
 			//
 			case TileID.MinecartTrack:
 			case TileID.Torches:
@@ -95,6 +95,11 @@ namespace PrefabKits.Items {
 			case TileID.Books:
 			case TileID.WaterCandle:
 			case TileID.PeaceCandle:
+			///
+			case TileID.HoneyDrip:
+			case TileID.LavaDrip:
+			case TileID.SandDrip:
+			case TileID.WaterDrip:
 			///
 			case TileID.MagicalIceBlock:
 				return true;
@@ -149,7 +154,7 @@ namespace PrefabKits.Items {
 				if( tile.type == TileID.OpenDoor || tile.type == TileID.TallGateOpen || tile.type == TileID.TrapdoorOpen ) {
 					return false;
 				}
-				return !Main.tileSolid[tile.type]
+				return !Main.tileSolid[ tile.type ]
 					|| (Main.tileSolidTop[tile.type] && tile.slope() != 0)  //stair
 					|| HouseFurnishingKitItem.IsCleanableTile( tile );
 			}

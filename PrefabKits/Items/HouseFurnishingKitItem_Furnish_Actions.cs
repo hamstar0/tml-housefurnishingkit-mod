@@ -19,6 +19,7 @@ namespace PrefabKits.Items {
 					continue;
 				}
 
+				tile.ClearTile();
 				tile.active( false );
 				tile.type = 0;
 				//WorldGen.KillTile( tileX, tileY, false, false, true );
@@ -83,7 +84,12 @@ namespace PrefabKits.Items {
 					sbyte direction,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
-			if( tileType == TileID.Containers || tileType == TileID.Containers2 || tileType == TileID.FakeContainers || tileType == TileID.FakeContainers2 ) {
+			bool isContainer = tileType == TileID.Containers
+				|| tileType == TileID.Containers2
+				|| tileType == TileID.FakeContainers
+				|| tileType == TileID.FakeContainers2;
+
+			if( isContainer ) {
 				int chestIdx = WorldGen.PlaceChest( leftTileX + 1, floorTileY, tileType );
 				if( chestIdx == -1 ) {
 					return false;
@@ -370,7 +376,10 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 
 		public static void ChangeFlooring( ushort tileType, int leftX, int rightX, int floorY ) {
 			for( int i=leftX-1; i<rightX+2; i++ ) {
-				Main.tile[ i, floorY + 1 ].type = tileType;
+				Tile tile = Main.tile[i, floorY + 1];
+				tile.ClearTile();
+
+				tile.type = tileType;
 				WorldGen.SquareTileFrame( i, floorY + 1 );
 			}
 		}
