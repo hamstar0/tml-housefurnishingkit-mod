@@ -23,7 +23,12 @@ namespace PrefabKits.Items {
 				}
 			}
 
-			var outerRect = new Rectangle( tileX - (width / 2), tileY - height, width, height );
+			var outerRect = new Rectangle(
+				tileX - (width / 2),
+				tileY - height,
+				width,
+				height
+			);
 			int availableArea = 0;
 
 			TileDrawPrimitivesHelpers.DrawRectangle(

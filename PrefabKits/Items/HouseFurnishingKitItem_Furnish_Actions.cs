@@ -19,7 +19,7 @@ namespace PrefabKits.Items {
 					continue;
 				}
 
-				tile.ClearTile();
+				tile.ClearEverything();
 				tile.active( false );
 				tile.type = 0;
 				//WorldGen.KillTile( tileX, tileY, false, false, true );
@@ -377,9 +377,11 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 		public static void ChangeFlooring( ushort tileType, int leftX, int rightX, int floorY ) {
 			for( int i=leftX-1; i<rightX+2; i++ ) {
 				Tile tile = Main.tile[i, floorY + 1];
-				tile.ClearTile();
+				tile.ClearEverything();
 
+				tile.active( true );
 				tile.type = tileType;
+
 				WorldGen.SquareTileFrame( i, floorY + 1 );
 			}
 		}
