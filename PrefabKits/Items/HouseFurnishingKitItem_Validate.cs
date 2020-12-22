@@ -34,7 +34,7 @@ namespace PrefabKits.Items {
 			switch( state ) {
 			case HouseViabilityState.Good:
 				color = Color.Lime;
-				return "Valid town house space found. Note: Only above ground houses are automatically occupied.";
+				return "Valid town house space found. Note: Only above ground houses automatically gain occupants.";
 			case HouseViabilityState.TooSmall:
 				minFurnishArea = config.Get<int>( nameof(config.MinimumFurnishableHouseArea) );
 				color = Color.Yellow;
