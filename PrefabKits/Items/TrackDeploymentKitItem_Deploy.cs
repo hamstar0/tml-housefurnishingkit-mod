@@ -5,8 +5,8 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
-using HamstarHelpers.Services.Timers;
 using HamstarHelpers.Helpers.Fx;
+using HamstarHelpers.Services.Timers;
 using PrefabKits.Protocols;
 
 

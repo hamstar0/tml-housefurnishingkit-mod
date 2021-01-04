@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
-using HamstarHelpers.Helpers.Tiles.Draw;
 using HamstarHelpers.Classes.Tiles.TilePattern;
+using HamstarHelpers.Helpers.Tiles.Draw;
 using HamstarHelpers.Helpers.Tiles;
 
 
