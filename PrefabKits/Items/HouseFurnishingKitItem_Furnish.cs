@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
-using HamstarHelpers.Services.Timers;
 using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Services.Timers;
 
 
 namespace PrefabKits.Items {
@@ -41,37 +41,44 @@ namespace PrefabKits.Items {
 
 			//
 
-			bool checkPlacement( int x, int y, int width ) {
+			(bool success, int _) checkPlacement( int x, int y, int width ) {
 				for( int x2 = x; x2 < x+width; x2++ ) {
 					for( int y2 = y; y2 >= y-3; y2-- ) {
 						if( Main.tile[x2, y2].active() && Main.tileSolid[Main.tile[x2, y2].type] ) {
-							return false;
+							return (false, -1);
 						}
 					}
 				}
-				return true;
+				return (true, -1);
 			}
 			
-			bool placeBed( int x, int y ) {
-				if( !checkPlacement( x, y, 4 ) ) {
-					return false;
+			(bool success, int tileType) placeBed( int x, int y ) {
+				if( !checkPlacement( x, y, 4 ).success ) {
+					return (false, TileID.Beds);
 				}
-				return HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Beds, 0, 1, fullHouseSpace, occupiedTiles );
+				bool success = HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Beds, 0, 1, fullHouseSpace, occupiedTiles );
+				return (success, TileID.Beds);
 			}
-			bool placeWorkbench( int x, int y ) {
-				if( !checkPlacement(x, y, 2) ) {
-					return false;
+			(bool success, int tileType) placeWorkbench( int x, int y ) {
+				if( !checkPlacement(x, y, 2).success ) {
+					return (false, TileID.WorkBenches);
 				}
-				return HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.WorkBenches, 0, 1, fullHouseSpace, occupiedTiles );
+				return (
+					HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.WorkBenches, 0, 1, fullHouseSpace, occupiedTiles ),
+					TileID.WorkBenches
+				);
 			}
-			bool placeChair( int x, int y ) {
-				if( !checkPlacement(x, y, 1) ) {
-					return false;
+			(bool success, int tileType) placeChair( int x, int y ) {
+				if( !checkPlacement(x, y, 1).success ) {
+					return (false, TileID.Chairs);
 				}
-				return HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Chairs, 0, 1, fullHouseSpace, occupiedTiles );
+				return (
+					HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Chairs, 0, 1, fullHouseSpace, occupiedTiles ),
+					TileID.Chairs
+				);
 			}
-			bool placeTorch( int x, int y ) {
-				return WorldGen.PlaceTile( x, y, TileID.Torches );
+			(bool success, int tileType) placeTorch( int x, int y ) {
+				return (WorldGen.PlaceTile( x, y, TileID.Torches ), TileID.Torches);
 			}
 
 			//

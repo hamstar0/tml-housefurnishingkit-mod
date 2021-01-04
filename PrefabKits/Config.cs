@@ -22,6 +22,8 @@ namespace PrefabKits {
 
 		public bool DebugModeInfo { get; set; } = false;
 
+		public bool DebugModeSuppressPlacementErrors { get; set; } = false;
+
 		////
 
 		[Range(0, 99999999 )]

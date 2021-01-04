@@ -19,14 +19,9 @@ namespace PrefabKits.Items {
 					continue;
 				}
 
-				tile.ClearEverything();
-				tile.active( false );
-				tile.type = 0;
-				//WorldGen.KillTile( tileX, tileY, false, false, true );
-
 				if( tile.type == TileID.Containers || tile.type == TileID.Containers2 ) {
-					if( Main.netMode == 2 ) {
-						int? chestTypeRaw = HamstarHelpers.Helpers.Tiles.Attributes.TileAttributeHelpers.GetChestTypeCode( tile.type );
+					if( Main.netMode == NetmodeID.Server ) {
+						int? chestTypeRaw = HamstarHelpers.Helpers.Tiles.Attributes.TileAttributeHelpers.GetChestTypeCode(tile.type);
 						int? chestType = chestTypeRaw.HasValue ? chestTypeRaw.Value : 0;
 
 						NetMessage.SendData(
@@ -43,6 +38,27 @@ namespace PrefabKits.Items {
 							number7: 0
 						);
 					}
+				}
+
+				tile.ClearEverything();
+				tile.active( false );
+				tile.type = 0;
+				//WorldGen.KillTile( tileX, tileY, false, false, true );
+			}
+		}
+
+
+		////////////////
+
+		private static void MarkFurnishedTiles(
+					int leftX,
+					int topY,
+					int width,
+					int height,
+					IDictionary<int, ISet<int>> furnishedTiles ) {
+			for( int x = leftX; x < leftX + width; x++ ) {
+				for( int y = topY; y < topY + height; y++ ) {
+					furnishedTiles.Set2D( x, y );
 				}
 			}
 		}
@@ -66,16 +82,6 @@ namespace PrefabKits.Items {
 
 		////////////////
 
-		private static void MarkOccupiedTiles( int leftX, int topY, int width, int height, IDictionary<int, ISet<int>> occupiedTiles ) {
-			for( int x = leftX; x < leftX + width; x++ ) {
-				for( int y = topY; y < topY + height; y++ ) {
-					occupiedTiles.Set2D( x, y );
-				}
-			}
-		}
-
-		////
-
 		private static bool MakeHouseTile(
 					int leftTileX,
 					int floorTileY,
@@ -83,7 +89,7 @@ namespace PrefabKits.Items {
 					int style,
 					sbyte direction,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
-					IDictionary<int, ISet<int>> occupiedTiles ) {
+					IDictionary<int, ISet<int>> furnishedTiles ) {
 			bool isContainer = tileType == TileID.Containers
 				|| tileType == TileID.Containers2
 				|| tileType == TileID.FakeContainers
@@ -117,9 +123,7 @@ namespace PrefabKits.Items {
 				if( !TilePlacementHelpers.PlaceObject( leftTileX, floorTileY, tileType, 0, direction ) ) {
 					//if( !TilePlacementHelpers.TryPrecisePlace(leftTileX, floorTileY, tileType, style, direction) ) {
 					if( !WorldGen.PlaceTile( leftTileX, floorTileY, tileType ) ) {
-						//throw new ModHelpersException( "Could not place tile "
-						//	+ (tileType >= Main.tileTexture.Length ? ""+tileType : TileID.Search.GetName(tileType))
-						//);
+						HouseFurnishingKitItem.OutputPlacementError( leftTileX, floorTileY, tileType, "house tile" );
 						return false;
 					}
 					WorldGen.SquareTileFrame( leftTileX, floorTileY );
@@ -131,13 +135,15 @@ namespace PrefabKits.Items {
 				tileObjData = TileObjectData.Style1x1;
 			}
 
-			HouseFurnishingKitItem.MarkOccupiedTiles(
+			int aboveFloorTileY = floorTileY - (tileObjData.Height - 1);
+			HouseFurnishingKitItem.MarkFurnishedTiles(
 				leftTileX,
-				floorTileY - (tileObjData.Height - 1),
+				aboveFloorTileY,
 				tileObjData.Width,
 				tileObjData.Height,
-				occupiedTiles
+				furnishedTiles
 			);
+
 /*int BLAH = 0;
 Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 	for( int i=leftTileX; i<leftTileX+tileObjData.Width; i++ ) {
@@ -156,15 +162,16 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 					int leftTileX,
 					int topTileY,
 					ushort tileType,
-					IDictionary<int, ISet<int>> occupiedTiles ) {
+					IDictionary<int, ISet<int>> furnishedTiles ) {
 			TilePlacementHelpers.Place3x3Wall( leftTileX, topTileY, tileType, 0 );
 
-			Tile tile = Main.tile[leftTileX, topTileY];
+			Tile tile = Main.tile[ leftTileX, topTileY ];
 			if( !tile.active() || tile.type != tileType ) {
+				HouseFurnishingKitItem.OutputPlacementError( leftTileX, topTileY, tileType, "3x3 wall tile" );
 				return false;
 			}
 
-			HouseFurnishingKitItem.MarkOccupiedTiles( leftTileX, topTileY, 3, 3, occupiedTiles );
+			HouseFurnishingKitItem.MarkFurnishedTiles( leftTileX, topTileY, 3, 3, furnishedTiles );
 			return true;
 		}
 
@@ -175,7 +182,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 					int rightTileX,
 					int floorTileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
-					IDictionary<int, ISet<int>> occupiedTiles ) {
+					IDictionary<int, ISet<int>> furnishedTiles ) {
 			var config = PrefabKitsConfig.Instance;
 
 			ushort custFurnType = config.Get<ushort>( nameof(config.CustomFurnitureTile) );
@@ -185,7 +192,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 					leftTileX,
 					floorTileY,
 					houseTiles,
-					occupiedTiles
+					furnishedTiles
 				);
 			}
 
@@ -193,13 +200,18 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 			if( custWallMount1 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
-						if( y >= floorTileY - 4 ) { return false; }
-						return HouseFurnishingKitItem.MakeHouseWallTile3x3( x, y, custWallMount1, occupiedTiles );
+						if( y >= floorTileY - 4 ) {
+							return (false, custWallMount1);
+						}
+						return (
+							HouseFurnishingKitItem.MakeHouseWallTile3x3( x, y, custWallMount1, furnishedTiles ),
+							custWallMount1
+						);
 					},
 					leftTileX,
 					floorTileY - 3,
 					houseTiles,
-					occupiedTiles
+					furnishedTiles
 				);
 			}
 
@@ -207,13 +219,18 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 			if( custWallMount2 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
-						if( y >= floorTileY - 4 ) { return false; }
-						return HouseFurnishingKitItem.MakeHouseWallTile3x3( x, y, custWallMount2, occupiedTiles );
+						if( y >= floorTileY - 4 ) {
+							return (false, custWallMount2);
+						}
+						return (
+							HouseFurnishingKitItem.MakeHouseWallTile3x3( x, y, custWallMount2, furnishedTiles ),
+							custWallMount2
+						);
 					},
 					rightTileX - 3,
 					floorTileY - 4,
 					houseTiles,
-					occupiedTiles
+					furnishedTiles
 				);
 			}
 		}
@@ -225,28 +242,33 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 					int floorTileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> occupiedTiles ) {
-			bool placeTile( int x, int y ) {
+			(bool, int) placeTile( int x, int y ) {
 				switch( tileType ) {
 				case TileID.Bottles:
 					TilePlacementHelpers.Place2x1( x, y, TileID.WorkBenches );
 					if( WorldGen.PlaceTile( x, y - 1, TileID.Bottles ) ) {
-						HouseFurnishingKitItem.MarkOccupiedTiles( x, y - 1, 2, 2, occupiedTiles );
-						return true;
+						HouseFurnishingKitItem.MarkFurnishedTiles( x, y - 1, 2, 2, occupiedTiles );
+						return (true, tileType);
 					}
 					break;
 				case TileID.PiggyBank:
 					TilePlacementHelpers.Place2x1( x, y, TileID.WorkBenches );
 					TilePlacementHelpers.Place2x1( x, y - 1, TileID.PiggyBank );
 					if( Main.tile[x, y].type == TileID.WorkBenches ) {
-						HouseFurnishingKitItem.MarkOccupiedTiles( x, y - 1, 2, 2, occupiedTiles );
-						return true;
+						HouseFurnishingKitItem.MarkFurnishedTiles( x, y - 1, 2, 2, occupiedTiles );
+						return (true, tileType);
 					}
 					break;
 				default:
-					return HouseFurnishingKitItem.MakeHouseTile( x, y, tileType, 0, -1, houseTiles, occupiedTiles );
+					return (
+						HouseFurnishingKitItem.MakeHouseTile( x, y, tileType, 0, -1, houseTiles, occupiedTiles ),
+						tileType
+					);
 				}
 
-				return false;
+				HouseFurnishingKitItem.OutputPlacementError( x, y, tileType, "custom main furniture" );
+
+				return (false, tileType);
 			}
 
 			HouseFurnishingKitItem.MakeHouseTileNear(
@@ -262,36 +284,36 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 		////////////////
 
 		public static bool MakeHouseTileNear(
-					Func<int, int, bool> placer,
+					Func<int, int, (bool, int)> placer,
 					int tileX,
 					int tileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
-					IDictionary<int, ISet<int>> occupiedTiles ) {
+					IDictionary<int, ISet<int>> furnishedTiles ) {
 			var scan = new HashSet<(int, int)>();
 
-			return HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY, houseTiles, occupiedTiles, scan );
+			return HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY, houseTiles, furnishedTiles, scan );
 		}
 
 		private static bool MakeHouseTileNearScan(
-					Func<int, int, bool> placer,
+					Func<int, int, (bool, int)> placer,
 					int tileX,
 					int tileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
-					IDictionary<int, ISet<int>> occupiedTiles,
+					IDictionary<int, ISet<int>> furnishedTiles,
 					ISet<(int, int)> scan ) {
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY, houseTiles, occupiedTiles) ) {
+			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY, houseTiles, furnishedTiles) ) {
 				return true;
 			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY - 1, houseTiles, occupiedTiles) ) {
+			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY - 1, houseTiles, furnishedTiles) ) {
 				return true;
 			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY + 1, houseTiles, occupiedTiles) ) {
+			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY + 1, houseTiles, furnishedTiles) ) {
 				return true;
 			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX - 1, tileY, houseTiles, occupiedTiles) ) {
+			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX - 1, tileY, houseTiles, furnishedTiles) ) {
 				return true;
 			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX + 1, tileY, houseTiles, occupiedTiles) ) {
+			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX + 1, tileY, houseTiles, furnishedTiles) ) {
 				return true;
 			}
 
@@ -299,32 +321,32 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 
 			if( !scan.Contains((tileX, tileY-1)) ) {
 				scan.Add( (tileX, tileY - 1) );
-				if( !occupiedTiles.Contains2D(tileX, tileY-1) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY - 1)) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY - 1, houseTiles, occupiedTiles, scan) ) {
+				if( !furnishedTiles.Contains2D(tileX, tileY-1) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY - 1)) ) ) {
+					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY - 1, houseTiles, furnishedTiles, scan) ) {
 						return true;
 					}
 				}
 			}
 			if( !scan.Contains((tileX, tileY+1)) ) {
 				scan.Add( (tileX, tileY + 1) );
-				if( !occupiedTiles.Contains2D(tileX, tileY+1) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY + 1)) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY + 1, houseTiles, occupiedTiles, scan) ) {
+				if( !furnishedTiles.Contains2D(tileX, tileY+1) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY + 1)) ) ) {
+					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY + 1, houseTiles, furnishedTiles, scan) ) {
 						return true;
 					}
 				}
 			}
 			if( !scan.Contains((tileX-1, tileY)) ) {
 				scan.Add( (tileX - 1, tileY) );
-				if( !occupiedTiles.Contains2D(tileX-1, tileY) && houseTiles.Contains( ((ushort)(tileX - 1), (ushort)tileY) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX - 1, tileY, houseTiles, occupiedTiles, scan) ) {
+				if( !furnishedTiles.Contains2D(tileX-1, tileY) && houseTiles.Contains( ((ushort)(tileX - 1), (ushort)tileY) ) ) {
+					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX - 1, tileY, houseTiles, furnishedTiles, scan) ) {
 						return true;
 					}
 				}
 			}
 			if( !scan.Contains((tileX+1, tileY)) ) {
 				scan.Add( (tileX + 1, tileY) );
-				if( !occupiedTiles.Contains2D(tileX+1, tileY) && houseTiles.Contains( ((ushort)(tileX + 1), (ushort)tileY) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX + 1, tileY, houseTiles, occupiedTiles, scan) ) {
+				if( !furnishedTiles.Contains2D(tileX+1, tileY) && houseTiles.Contains( ((ushort)(tileX + 1), (ushort)tileY) ) ) {
+					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX + 1, tileY, houseTiles, furnishedTiles, scan) ) {
 						return true;
 					}
 				}
@@ -336,12 +358,12 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 		}
 
 		public static bool RunPlacerAt(
-					Func<int, int, bool> placer,
+					Func<int, int, (bool, int)> placer,
 					int tileX,
 					int tileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
-					IDictionary<int, ISet<int>> occupiedTiles ) {
-			if( occupiedTiles.Contains2D(tileX, tileY) ) {
+					IDictionary<int, ISet<int>> furnishedTiles ) {
+			if( furnishedTiles.Contains2D(tileX, tileY) ) {
 //int BLAH = 0;
 //Timers.SetTimer( "BLHA1_"+tileX+"_"+tileY, 3, false, () => {
 //	Dust.QuickDust( new Point(tileX, tileY), Color.Red );
@@ -359,9 +381,11 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 				return false;
 			}
 
-			bool isPlaced = placer( tileX, tileY );
-			if( isPlaced ) {
-				occupiedTiles.Set2D( tileX, tileY );
+			(bool isPlaced, int tileType) result = placer( tileX, tileY );
+			if( result.isPlaced ) {
+				furnishedTiles.Set2D( tileX, tileY );
+			} else {
+				HouseFurnishingKitItem.OutputPlacementError( tileX, tileY, result.tileType, "placer" );
 			}
 //else {
 //int BLAH = 0;
@@ -370,7 +394,7 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 //	return BLAH++ < 100;
 //} );
 //}
-			return isPlaced;
+			return result.isPlaced;
 		}
 
 
@@ -384,6 +408,32 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 
 				WorldGen.SquareTileFrame( i, floorY + 1 );
 			}
+		}
+
+
+		////////////////
+
+		private static void OutputPlacementError( int tileX, int tileY, int tileType, string context ) {
+			if( PrefabKitsConfig.Instance.DebugModeSuppressPlacementErrors ) {
+				return;
+			}
+
+			LogHelpers.Log( "Could not place "+context+" "
+				+ ( tileType >= Main.tileTexture.Length
+					? tileType.ToString()
+					: TileID.Search.GetName(tileType) )
+				+ " at "+tileX+", "+tileY
+			);
+
+			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY-1)+" - "+Main.tile[tileX-1, tileY-1].ToString() );
+			LogHelpers.Log( "  "+(tileX)+", "+(tileY-1)+" - "+Main.tile[tileX, tileY-1].ToString() );
+			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY-1)+" - "+Main.tile[tileX+1, tileY-1].ToString() );
+			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY)+" - "+Main.tile[tileX-1, tileY].ToString() );
+			LogHelpers.Log( "  "+(tileX)+", "+(tileY)+" - "+Main.tile[tileX, tileY].ToString() );
+			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY)+" - "+Main.tile[tileX+1, tileY].ToString() );
+			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY+1)+" - "+Main.tile[tileX-1, tileY+1].ToString() );
+			LogHelpers.Log( "  "+(tileX)+", "+(tileY+1)+" - "+Main.tile[tileX, tileY+1].ToString() );
+			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY+1)+" - "+Main.tile[tileX+1, tileY+1].ToString() );
 		}
 	}
 }
