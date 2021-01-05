@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using HamstarHelpers.Helpers.Debug;
 using PrefabKits.Protocols;
@@ -92,7 +93,7 @@ namespace PrefabKits.Items {
 			);
 
 			if( state == HouseViabilityState.Good ) {
-				if( Main.netMode == 0 ) {
+				if( Main.netMode == NetmodeID.SinglePlayer ) {
 					return HouseFurnishingKitItem.FurnishHouseFull(
 						player,
 						tileX,
@@ -102,10 +103,10 @@ namespace PrefabKits.Items {
 						floorX,
 						floorY
 					);
-				} else if( Main.netMode == 1 ) {
+				} else if( Main.netMode == NetmodeID.MultiplayerClient ) {
 					FurnishingKitProtocol.SendToServer( player, tileX, tileY );
 					return true;
-				} else if( Main.netMode == 2 ) {
+				} else if( Main.netMode == NetmodeID.Server ) {
 					LogHelpers.Alert( "Server?" );
 				}
 			} else {

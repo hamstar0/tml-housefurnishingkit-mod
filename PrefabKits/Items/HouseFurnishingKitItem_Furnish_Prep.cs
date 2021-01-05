@@ -37,10 +37,26 @@ namespace PrefabKits.Items {
 					}
 				}
 
+				//try {
+				//	PrefabKitsTile.NoItemOverride[ (tileX, tileY) ] = true;
+				//	WorldGen.KillTile( tileX, tileY, false, false, true );
+				//} catch { }
+
+				switch( tile.type ) {
+				case TileID.Containers:
+				case TileID.Containers2:
+				case TileID.FakeContainers:
+				case TileID.FakeContainers2:
+					int chestIdx = Chest.FindChestByGuessing( tileX, tileY );
+					if( chestIdx != -1 ) {
+						Chest.DestroyChestDirect( tileX, tileY, chestIdx );
+					}
+					break;
+				}
+
 				tile.ClearEverything();
 				tile.active( false );
 				tile.type = 0;
-				//WorldGen.KillTile( tileX, tileY, false, false, true );
 			}
 		}
 

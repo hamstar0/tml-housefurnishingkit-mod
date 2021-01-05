@@ -136,31 +136,5 @@ Timers.SetTimer( "BLHA_"+tileType, 3, false, () => {
 			HouseFurnishingKitItem.MarkFurnishedTiles( leftTileX, topTileY, 3, 3, furnishedTiles );
 			return true;
 		}
-
-
-		////////////////
-
-		private static void OutputPlacementError( int tileX, int tileY, int tileType, string context ) {
-			if( PrefabKitsConfig.Instance.DebugModeSuppressPlacementErrors ) {
-				return;
-			}
-
-			LogHelpers.Log( "Could not place "+context+" "
-				+ ( tileType >= Main.tileTexture.Length
-					? tileType.ToString()
-					: TileID.Search.GetName(tileType) )
-				+ " at "+tileX+", "+tileY
-			);
-
-			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY-1)+" - "+Main.tile[tileX-1, tileY-1].ToString() );
-			LogHelpers.Log( "  "+(tileX)+", "+(tileY-1)+" - "+Main.tile[tileX, tileY-1].ToString() );
-			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY-1)+" - "+Main.tile[tileX+1, tileY-1].ToString() );
-			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY)+" - "+Main.tile[tileX-1, tileY].ToString() );
-			LogHelpers.Log( "  "+(tileX)+", "+(tileY)+" - "+Main.tile[tileX, tileY].ToString() );
-			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY)+" - "+Main.tile[tileX+1, tileY].ToString() );
-			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY+1)+" - "+Main.tile[tileX-1, tileY+1].ToString() );
-			LogHelpers.Log( "  "+(tileX)+", "+(tileY+1)+" - "+Main.tile[tileX, tileY+1].ToString() );
-			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY+1)+" - "+Main.tile[tileX+1, tileY+1].ToString() );
-		}
 	}
 }

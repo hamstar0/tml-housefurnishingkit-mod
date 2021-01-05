@@ -15,78 +15,120 @@ namespace PrefabKits.Items {
 					int tileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
 					IDictionary<int, ISet<int>> furnishedTiles ) {
-			var scan = new HashSet<(int, int)>();
+			(bool success, int tileType, int x, int y) result = HouseFurnishingKitItem.MakeHouseTileNearScan(
+				attempts: new HashSet<(int, int)>(),
+				depth: 5,
+				placer,
+				tileX,
+				tileY,
+				houseTiles,
+				furnishedTiles
+			);
+//if( result.success ) {
+//LogHelpers.Log( "Placed "+result.tileType+" at "+result.x+", "+result.y+" (was "+tileX+", "+tileY+")" );
+//}
 
-			return HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY, houseTiles, furnishedTiles, scan );
+			return result.success;
 		}
 
-		private static bool MakeHouseTileNearScan(
+		private static (bool success, int tileType, int x, int y) MakeHouseTileNearScan(
+					ISet<(int x, int y)> attempts,
+					int depth,
 					Func<int, int, (bool, int)> placer,
 					int tileX,
 					int tileY,
 					IList<(ushort TileX, ushort TileY)> houseTiles,
-					IDictionary<int, ISet<int>> furnishedTiles,
-					ISet<(int, int)> scan ) {
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY, houseTiles, furnishedTiles) ) {
-				return true;
+					IDictionary<int, ISet<int>> furnishedTiles ) {
+			if( depth < 0 ) {
+				return (false, -1, tileX, tileY);
 			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY - 1, houseTiles, furnishedTiles) ) {
-				return true;
+			if( attempts.Contains((tileX, tileY)) ) {
+				return (false, -1, tileX, tileY);
 			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX, tileY + 1, houseTiles, furnishedTiles) ) {
-				return true;
-			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX - 1, tileY, houseTiles, furnishedTiles) ) {
-				return true;
-			}
-			if( HouseFurnishingKitItem.RunPlacerAt(placer, tileX + 1, tileY, houseTiles, furnishedTiles) ) {
-				return true;
+			if( !houseTiles.Contains(((ushort)tileX, (ushort)tileY)) ) {
+				return (false, -1, tileX, tileY);
 			}
 
 			//
 
-			if( !scan.Contains((tileX, tileY-1)) ) {
-				scan.Add( (tileX, tileY - 1) );
-				if( !furnishedTiles.Contains2D(tileX, tileY-1) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY - 1)) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY - 1, houseTiles, furnishedTiles, scan) ) {
-						return true;
-					}
+			(bool success, int tileType, int x, int y) result = default;
+
+			//
+
+			(bool success, int tileType, int x, int y) attemptPlacerAt( int x, int y ) {
+				if( attempts.Contains( (x, y) ) ) {
+					return (false, -1, x, y);
 				}
+
+				(bool s, int t) myresult = HouseFurnishingKitItem.RunPlacerAt( placer, x, y, houseTiles, furnishedTiles );
+				attempts.Add( (x, y) );
+/*if( myresult.t == 480 ) {
+Timers.RunUntil( () => {
+	Dust.QuickDust( new Point(x, y), myresult.s ? Color.Lime : Color.Red );
+	return true;
+}, 60, true );
+}*/
+				return (myresult.s, myresult.t, x, y);
 			}
-			if( !scan.Contains((tileX, tileY+1)) ) {
-				scan.Add( (tileX, tileY + 1) );
-				if( !furnishedTiles.Contains2D(tileX, tileY+1) && houseTiles.Contains( ((ushort)tileX, (ushort)(tileY + 1)) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX, tileY + 1, houseTiles, furnishedTiles, scan) ) {
-						return true;
-					}
-				}
-			}
-			if( !scan.Contains((tileX-1, tileY)) ) {
-				scan.Add( (tileX - 1, tileY) );
-				if( !furnishedTiles.Contains2D(tileX-1, tileY) && houseTiles.Contains( ((ushort)(tileX - 1), (ushort)tileY) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX - 1, tileY, houseTiles, furnishedTiles, scan) ) {
-						return true;
-					}
-				}
-			}
-			if( !scan.Contains((tileX+1, tileY)) ) {
-				scan.Add( (tileX + 1, tileY) );
-				if( !furnishedTiles.Contains2D(tileX+1, tileY) && houseTiles.Contains( ((ushort)(tileX + 1), (ushort)tileY) ) ) {
-					if( HouseFurnishingKitItem.MakeHouseTileNearScan( placer, tileX + 1, tileY, houseTiles, furnishedTiles, scan) ) {
-						return true;
-					}
-				}
+
+			(bool success, int tileType, int x, int y) attemptRescanAndPlaceAt( int x, int y ) {
+				return HouseFurnishingKitItem.MakeHouseTileNearScan(
+					attempts,
+					depth-1,
+					placer,
+					x,
+					y,
+					houseTiles,
+					furnishedTiles
+				);
 			}
 
 			//
 
-			return false;
+			result = attemptPlacerAt( tileX, tileY );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptPlacerAt( tileX, tileY - 1 );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptPlacerAt( tileX, tileY + 1 );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptPlacerAt( tileX - 1, tileY );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptPlacerAt( tileX + 1, tileY );
+			if( result.success ) {
+				return result;
+			}
+
+			HouseFurnishingKitItem.OutputPlacementError( tileX, tileY, result.tileType, "placer for" );
+
+			result = attemptRescanAndPlaceAt( tileX - 1, tileY - 1 );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptRescanAndPlaceAt( tileX + 1, tileY - 1 );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptRescanAndPlaceAt( tileX - 1, tileY + 1 );
+			if( result.success ) {
+				return result;
+			}
+			result = attemptRescanAndPlaceAt( tileX + 1, tileY + 1 );
+
+			return result;
 		}
 
 
 		////////////////
 
-		public static bool RunPlacerAt(
+		public static (bool, int) RunPlacerAt(
 					Func<int, int, (bool, int)> placer,
 					int tileX,
 					int tileY,
@@ -98,23 +140,21 @@ namespace PrefabKits.Items {
 //	Dust.QuickDust( new Point(tileX, tileY), Color.Red );
 //	return BLAH++ < 100;
 //} );
-				return false;
+				return (false, -1);
 			}
 
-			if( !houseTiles.Contains( ((ushort)tileX, (ushort)tileY) ) ) {
+			if( !houseTiles.Contains( ((ushort)tileX, (ushort)tileY)) ) {
 //int BLAH = 0;
 //Timers.SetTimer( "BLHA2_"+tileX+"_"+tileY, 3, false, () => {
 //	Dust.QuickDust( new Point(tileX, tileY), Color.Green );
 //	return BLAH++ < 100;
 //} );
-				return false;
+				return (false, -1);
 			}
 
 			(bool isPlaced, int tileType) result = placer( tileX, tileY );
 			if( result.isPlaced ) {
 				furnishedTiles.Set2D( tileX, tileY );
-			} else {
-				HouseFurnishingKitItem.OutputPlacementError( tileX, tileY, result.tileType, "placer" );
 			}
 //else {
 //int BLAH = 0;
@@ -123,7 +163,7 @@ namespace PrefabKits.Items {
 //	return BLAH++ < 100;
 //} );
 //}
-			return result.isPlaced;
+			return result;
 		}
 	}
 }

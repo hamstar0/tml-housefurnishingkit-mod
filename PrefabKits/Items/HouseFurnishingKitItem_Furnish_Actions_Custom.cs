@@ -33,7 +33,7 @@ namespace PrefabKits.Items {
 			if( custWallMount1 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
-						if( y >= floorTileY - 4 ) {
+						if( y >= floorTileY - 1 ) { //floorTileY - 4
 							return (false, custWallMount1);
 						}
 						return (
@@ -52,7 +52,7 @@ namespace PrefabKits.Items {
 			if( custWallMount2 != 0 ) {
 				HouseFurnishingKitItem.MakeHouseTileNear(
 					( x, y ) => {
-						if( y >= floorTileY - 4 ) {
+						if( y >= floorTileY - 1 ) { //floorTileY - 4
 							return (false, custWallMount2);
 						}
 						return (

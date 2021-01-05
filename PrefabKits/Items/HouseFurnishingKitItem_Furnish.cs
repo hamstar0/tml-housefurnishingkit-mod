@@ -20,7 +20,7 @@ namespace PrefabKits.Items {
 			(int x, int y) outerTopLeft, outerTopRight;
 			int floorLeft, floorRight;
 			(int x, int y) farTopLeft, farTopRight;
-			IDictionary<int, ISet<int>> occupiedTiles = new Dictionary<int, ISet<int>>();
+			IDictionary<int, ISet<int>> furnishedTiles = new Dictionary<int, ISet<int>>();
 
 			HouseFurnishingKitItem.FindHousePoints(
 				innerHouseSpace: innerHouseSpace,
@@ -56,7 +56,7 @@ namespace PrefabKits.Items {
 				if( !checkPlacement( x, y, 4 ).success ) {
 					return (false, TileID.Beds);
 				}
-				bool success = HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Beds, 0, 1, fullHouseSpace, occupiedTiles );
+				bool success = HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Beds, 0, 1, fullHouseSpace, furnishedTiles );
 				return (success, TileID.Beds);
 			}
 			(bool success, int tileType) placeWorkbench( int x, int y ) {
@@ -64,7 +64,7 @@ namespace PrefabKits.Items {
 					return (false, TileID.WorkBenches);
 				}
 				return (
-					HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.WorkBenches, 0, 1, fullHouseSpace, occupiedTiles ),
+					HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.WorkBenches, 0, 1, fullHouseSpace, furnishedTiles ),
 					TileID.WorkBenches
 				);
 			}
@@ -73,7 +73,7 @@ namespace PrefabKits.Items {
 					return (false, TileID.Chairs);
 				}
 				return (
-					HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Chairs, 0, 1, fullHouseSpace, occupiedTiles ),
+					HouseFurnishingKitItem.MakeHouseTile( x, y, TileID.Chairs, 0, 1, fullHouseSpace, furnishedTiles ),
 					TileID.Chairs
 				);
 			}
@@ -87,12 +87,12 @@ namespace PrefabKits.Items {
 
 			Timers.SetTimer( "HouseKitsFurnishingDelay", 1, false, () => {
 				HouseFurnishingKitItem.MakeHouseWalls( fullHouseSpace );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeBed,			floorLeft,		floorY, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeWorkbench,	floorRight - 2,	floorY, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeChair,		floorRight - 3,	floorY, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseCustomFurnishings(			floorLeft,		floorRight, floorY, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopLeft.x,		innerTopLeft.y, fullHouseSpace, occupiedTiles );
-				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopRight.x,		innerTopRight.y, fullHouseSpace, occupiedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeBed,			floorLeft,		floorY,			fullHouseSpace, furnishedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeWorkbench,	floorRight - 2,	floorY,			fullHouseSpace, furnishedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeChair,		floorRight - 3,	floorY,			fullHouseSpace, furnishedTiles );
+				HouseFurnishingKitItem.MakeHouseCustomFurnishings( floorLeft, floorRight,	floorY,			fullHouseSpace, furnishedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopLeft.x,	innerTopLeft.y, fullHouseSpace, furnishedTiles );
+				HouseFurnishingKitItem.MakeHouseTileNear( placeTorch,		innerTopRight.x,innerTopRight.y,fullHouseSpace, furnishedTiles );
 
 				if( config.Get<ushort>( nameof(config.CustomFloorTile) ) > 0 ) {
 					HouseFurnishingKitItem.ChangeFlooring(
@@ -133,6 +133,32 @@ namespace PrefabKits.Items {
 
 				return false;
 			} );
+		}
+
+
+		////////////////
+
+		private static void OutputPlacementError( int tileX, int tileY, int tileType, string context ) {
+			if( PrefabKitsConfig.Instance.DebugModeSuppressPlacementErrors ) {
+				return;
+			}
+
+			LogHelpers.Log( "Could not place "+context+" "
+				+ ( tileType >= TileID.Count || tileType < 0
+					? tileType.ToString()
+					: TileID.Search.GetName(tileType) )
+				+ " at "+tileX+", "+tileY
+			);
+
+			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY-1)+" - "+Main.tile[tileX-1, tileY-1].ToString() );
+			LogHelpers.Log( "  "+(tileX)+", "+(tileY-1)+" - "+Main.tile[tileX, tileY-1].ToString() );
+			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY-1)+" - "+Main.tile[tileX+1, tileY-1].ToString() );
+			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY)+" - "+Main.tile[tileX-1, tileY].ToString() );
+			LogHelpers.Log( "  "+(tileX)+", "+(tileY)+" - "+Main.tile[tileX, tileY].ToString() );
+			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY)+" - "+Main.tile[tileX+1, tileY].ToString() );
+			LogHelpers.Log( "  "+(tileX-1)+", "+(tileY+1)+" - "+Main.tile[tileX-1, tileY+1].ToString() );
+			LogHelpers.Log( "  "+(tileX)+", "+(tileY+1)+" - "+Main.tile[tileX, tileY+1].ToString() );
+			LogHelpers.Log( "  "+(tileX+1)+", "+(tileY+1)+" - "+Main.tile[tileX+1, tileY+1].ToString() );
 		}
 	}
 }
